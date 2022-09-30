@@ -1,4 +1,4 @@
-# d-stor
+# d-Stor
 d-Stor is a decentralized cloud storage platform utilizing decentralized encryption, access control and identity management for one of the first fully decentralized cloud storage platforms. 
 
 # Stack
