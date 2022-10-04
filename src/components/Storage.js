@@ -51,6 +51,7 @@ const Chainsafe = (props) => {
       await client.connect()
     } 
     const db_user = await JSON.parse(sessionStorage.getItem('db_user'))
+    // TO DO get accessControlConditions from db_user
     const accessControlConditions = []
     accessControlConditions.push(db_user.nft_info) 
     const authSig = await props.authSig

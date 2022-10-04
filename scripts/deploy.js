@@ -12,12 +12,12 @@ async function main() {
 
   await mintAccessNft.deployed();
 
-  const tx = await mintAccessNft.giveAccess();
-  const receipt = await tx.wait();
+  // const tx = await mintAccessNft.emitEvent();
+  // const receipt = await tx.wait();
 
-  for (const event of receipt.events) {
-    console.log(`Event ${event.event} with tokenID ${event.args.tokenId}`)
-  }
+  // for (const event of receipt.events) {
+  //   console.log(`Event ${event.event} with tokenID ${event.args.tokenId}`)
+  // }
 
   console.log("Contract deployed address is:", mintAccessNft.address)
 

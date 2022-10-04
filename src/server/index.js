@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const pgSession = require('connect-pg-simple')(sessions);
 require('dotenv').config();
+//const hre = require("hardhat");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -84,8 +85,8 @@ app.post("/connect_wallet", async (req, res) => {
     const address_lc = await address.toLowerCase();
     const newUser = await pool.query("INSERT INTO users (address) VALUES($1) RETURNING *", [address_lc]);
     // TO DO stringify the session user instead. user is what is sent to client.
-    const user = JSON.stringify(newUser.rows[0]);
-    console.log("NEW USER:", newUser)
+    //const user = JSON.stringify(newUser.rows[0]);
+    console.log("NEW USER:", newUser.rows[0])
     session.user = newUser.rows[0];
     // create new chainsafe bucket, store info in session and push to db
     try {
@@ -103,17 +104,15 @@ app.post("/connect_wallet", async (req, res) => {
           body: JSON.stringify(body)
         })
         const json = await response.json()
-        session.user.bucket_id = json.id
+        session.user.bucket_id = await json.id
         console.log("SESSION USER IS:", session.user)
+        // send session user back to client
+        res.send(session.user)
       }
       newBucket();
     } catch (error) {
       console.log(error)
     }
-    // TO DO update session user include bucket ID
-
-    // send session user back to client
-    res.send(user)
     return;
   }
 
@@ -127,8 +126,31 @@ app.post("/connect_wallet", async (req, res) => {
   } catch (error) {
     console.log(error)
   }
+});
+
+//update db with encrypted key and access control info
+app.post('/update', async (req, res) => {
+const {key, address, accessControlConditions} = req.body
+const address_lc = address.toLowerCase();
+await pool.query("UPDATE users SET encrypted_key=$1 WHERE address=$2 RETURNING *", [key, address_lc]);
+const updatedUser = await pool.query("UPDATE users SET nft_info=$1 WHERE address=$2 RETURNING *", [accessControlConditions, address_lc]);
+//const updatedUser = await pool.query("UPDATE users SET nft_info=$1 WHERE address=$2 VALUES($1, $2) RETURNING *", [accessControlConditions, address_lc])
+console.log("UPDATED USER:", updatedUser.rows[0])
 })
 
+// app.get("/mint", async (req, res) => {
+//   const MintAccessNft = await hre.ethers.getContractFactory("MintAccessNft");
+//   const mintAccessNft = await MintAccessNft.deploy();
+
+//   await mintAccessNft.deployed();
+
+//   const tx = await mintAccessNft.emitEvent();
+//   const receipt = await tx.wait();
+//   const _id = await receipt.events[0].args['NewItemId']
+//   console.log("NFT ID", receipt.events[0].args['NewItemId'])
+//   res.send(_id)
+//   return;
+// });
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {

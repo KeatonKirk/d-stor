@@ -28,10 +28,10 @@ const Login = (props) => {
 		});	
 		const body = await response.json()
 		const body_string = JSON.stringify(body)
-		console.log('BODY STRING;', body_string)
+		console.log('BODY STRING;', body)
 		window.sessionStorage.setItem('db_user', body_string);
 		if (!body.encrypted_key){
-			 mint();
+			 await mint();
 			}
 		props.onSubmit(data)
 		}

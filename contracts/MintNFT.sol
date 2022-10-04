@@ -7,20 +7,23 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract MintAccessNft is ERC721URIStorage {
     event NFTMinted(uint256 indexed NewItemId);
-    using Counters for Counters.Counter;
-    Counters.Counter public _tokenIds;
+    uint256 tokenId = 1;
+    mapping (address => uint256) public tokenAddress;
+    mapping (uint256 => bool) public tokenExists;
 
-    constructor() ERC721("AccessToken", "NFT") {}
+    constructor() ERC721("dStorAccess", "DSA") {}
 
-    function giveAccess() 
+    function mintToken() 
         public
-        returns (uint256)
-    {
-        uint256 newItemId = _tokenIds.current();
-        _mint(msg.sender, newItemId);
+    {  
+        require(!tokenExists[tokenId], "token already exists");
+        _safeMint(msg.sender, tokenId);
+        tokenAddress[msg.sender] = tokenId;
+        tokenExists[tokenId] = true;
+        tokenId++;
+    }
 
-        _tokenIds.increment();
-        emit NFTMinted(newItemId);
-        return newItemId;
+    function getMyTokens() public view returns (uint256) {
+        return tokenAddress[msg.sender];
     }
 }
