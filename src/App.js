@@ -32,11 +32,12 @@ function App() {
   console.log("APP COOKIES:",ceramic_cookie_exists)
 
 
+
   return (
     <Provider client={{ ceramic: 'testnet-clay' }}>
       <Router>
         <Routes>
-          <Route path='/' element={authSig && sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <Login2 onSubmit={setAuthSig}/> }/>
+          <Route path='/' element={authSig && sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <Login2 setAuthSig={setAuthSig}/> }/>
           <Route path='/storage' element={<Storage authSig={storedSig}/>}/>
         </Routes>
       </Router>

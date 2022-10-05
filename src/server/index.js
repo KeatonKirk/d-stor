@@ -134,7 +134,7 @@ const {key, address, accessControlConditions} = req.body
 const address_lc = address.toLowerCase();
 await pool.query("UPDATE users SET encrypted_key=$1 WHERE address=$2 RETURNING *", [key, address_lc]);
 const updatedUser = await pool.query("UPDATE users SET nft_info=$1 WHERE address=$2 RETURNING *", [accessControlConditions, address_lc]);
-//const updatedUser = await pool.query("UPDATE users SET nft_info=$1 WHERE address=$2 VALUES($1, $2) RETURNING *", [accessControlConditions, address_lc])
+res.send(updatedUser)
 console.log("UPDATED USER:", updatedUser.rows[0])
 })
 

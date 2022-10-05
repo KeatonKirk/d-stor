@@ -17,6 +17,8 @@ const Chainsafe = (props) => {
   client.connect();
   window.litNodeClient = client;
 
+  const encString = props.encString
+
   // const encrypt = async (stringToEncrypt) => {
   //   if (!client.litNodeClient) {
   //     await client.connect()
@@ -52,8 +54,7 @@ const Chainsafe = (props) => {
     } 
     const db_user = await JSON.parse(sessionStorage.getItem('db_user'))
     // TO DO get accessControlConditions from db_user
-    const accessControlConditions = []
-    accessControlConditions.push(db_user.nft_info) 
+    const accessControlConditions = db_user.nft_info
     const authSig = await props.authSig
     // convert base64 string to blob
     const encryptedString = LitJsSdk.base64StringToBlob(stringToDecrypt)

@@ -4,7 +4,7 @@ import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework"
 import {mint}from "./NewUser"
 
 const Login = (props) => {
-	//const [sig, setSig] = useState(null);
+	const [encString, setEncString] = useState();
 	const [connection, connect, disconnect] = useViewerConnection();
 
 	const handleClick = async (e) => {
@@ -28,12 +28,15 @@ const Login = (props) => {
 		});	
 		const body = await response.json()
 		const body_string = JSON.stringify(body)
-		console.log('BODY STRING;', body)
+		console.log('BODY STRING;', body_string)
 		window.sessionStorage.setItem('db_user', body_string);
+		console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
 		if (!body.encrypted_key){
-			 await mint();
+			 const encryptedString = await mint();
+			 window.sessionStorage.setItem('encrypted_string', encryptedString)
+			 console.log("ENCRYPTED STRING IN SESS:", sessionStorage.getItem('encrypted_string'))
 			}
-		props.onSubmit(data)
+		props.setAuthSig(data)
 		}
 		await sendSig(sigToSend)
 	} 
