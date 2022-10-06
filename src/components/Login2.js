@@ -1,11 +1,13 @@
 import React, {useState, useEffect, Fragment} from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
-import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework"
+//import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework"
 import {mint}from "./NewUser"
+//import { EthereumAuthProvider, SelfID } from '@self.id/web'
+import {setDstorId, createSelfID} from './SetRecordInfo'
 
 const Login = (props) => {
 	const [encString, setEncString] = useState();
-	const [connection, connect, disconnect] = useViewerConnection();
+	//const [connection, connect, disconnect] = useViewerConnection();
 
 	const handleClick = async (e) => {
 	e.preventDefault();
@@ -14,8 +16,8 @@ const Login = (props) => {
 	const accounts = await window.ethereum.request({
 		method: 'eth_requestAccounts',
 	})
-	await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
-
+	//await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
+	const selfID = await createSelfID(accounts[0]);
 	const sigToSend = JSON.stringify(data)
 	const sendSig = async (sig) => {
 		const api_url = '/connect_wallet'
@@ -35,10 +37,13 @@ const Login = (props) => {
 			 const encryptedString = await mint();
 			 window.sessionStorage.setItem('encrypted_string', encryptedString)
 			 console.log("ENCRYPTED STRING IN SESS:", sessionStorage.getItem('encrypted_string'))
+			 await setDstorId(selfID)
 			}
-		props.setAuthSig(data)
+		
 		}
 		await sendSig(sigToSend)
+		await props.setAuthSig(data)
+		
 	} 
 
 	return (

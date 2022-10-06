@@ -1,12 +1,12 @@
 import React from "react";
 import {useState, useEffect, useRef} from 'react';
-import { useViewerRecord, useViewerConnection, EthereumAuthProvider } from "@self.id/framework";
+import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework";
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import Record from './Record'
 
 
 const Chainsafe = (props) => {
-  const [connection, connect, disconnect] = useViewerConnection();
+  const [connection, connect] = useViewerConnection();
   // const [encString, setEncString] = useState();
   // const [encKey, setEncKey] = useState();
   const [string, setString] = useState();
