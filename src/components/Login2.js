@@ -9,16 +9,7 @@ const Login = (props) => {
 	const [encString, setEncString] = useState();
 	//const [connection, connect, disconnect] = useViewerConnection();
 
-	const handleClick = async (e) => {
-	e.preventDefault();
-
-	const data = await LitJsSdk.checkAndSignAuthMessage({chain: "ropsten",});	
-	const accounts = await window.ethereum.request({
-		method: 'eth_requestAccounts',
-	})
-	//await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
-	const selfID = await createSelfID(accounts[0]);
-	const sigToSend = JSON.stringify(data)
+	let db_response_body;
 	const sendSig = async (sig) => {
 		const api_url = '/connect_wallet'
 		const response =  await fetch(api_url, {
@@ -28,21 +19,35 @@ const Login = (props) => {
 			},
 			body: sig
 		});	
-		const body = await response.json()
-		const body_string = JSON.stringify(body)
+		db_response_body = await response.json()
+		const body_string = JSON.stringify(db_response_body)
 		console.log('BODY STRING;', body_string)
 		window.sessionStorage.setItem('db_user', body_string);
 		console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
-		if (!body.encrypted_key){
-			 const encryptedString = await mint();
-			 window.sessionStorage.setItem('encrypted_string', encryptedString)
-			 console.log("ENCRYPTED STRING IN SESS:", sessionStorage.getItem('encrypted_string'))
-			 await setDstorId(selfID)
-			}
-		
 		}
-		await sendSig(sigToSend)
-		await props.setAuthSig(data)
+
+	const handleClick = async (e) => {
+	e.preventDefault();
+
+	const data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});	
+	const accounts = await window.ethereum.request({
+		method: 'eth_requestAccounts',
+	})
+	//await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
+	const selfID = await createSelfID(accounts[0]);
+	const sigToSend = JSON.stringify(data)
+
+	await sendSig(sigToSend)
+
+	if (!db_response_body.encrypted_key){
+		console.log('NEW USER FLOW STARTED')
+		const encryptedString = await mint();
+		window.sessionStorage.setItem('encrypted_string', encryptedString)
+		console.log("ENCRYPTED STRING IN SESS:", encryptedString)
+		await setDstorId(selfID)
+	}
+	
+	await props.setAuthSig(data)
 		
 	} 
 

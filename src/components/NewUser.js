@@ -13,7 +13,7 @@ import {ethers} from 'ethers'
 
 // this should push access control conditions and encryptedSymmetricKey to database
 
-	const contractAddress = '0x1246b9E3ADF02108374cAb5a14Eb7D28686F66d9'
+	const contractAddress = '0xAbaDf831858e31AcBc58A0B4d4997488d78f5FcF'
 	
 	// let db_user = JSON.parse(window.sessionStorage.getItem('db_user'))
 	// console.log("DB USER AT BEGINNING OF NEW USER FLOW:", db_user)
@@ -28,7 +28,7 @@ import {ethers} from 'ethers'
 	const contractWithSigner = contract.connect(signer)
 
 	const accessControlConditions = [{
-		chain: "ropsten",
+		chain: "goerli",
 		method: "balanceOf",
 		parameters: [
 			':userAddress',
@@ -52,7 +52,7 @@ import {ethers} from 'ethers'
       await client.connect()
     } 
 
-    const chain = 'ropsten'  
+    const chain = 'goerli'  
     // const user = await JSON.parse(sessionStorage.getItem('db_user'))
     const authSig = await JSON.parse(window.localStorage.getItem("lit-auth-signature"))
     // encrypting a string using access control conditions and authsig from existing app state
@@ -92,15 +92,16 @@ import {ethers} from 'ethers'
 		
     // console.log("BLOB CONVERSION:", encStringToStore)
     // console.log("Enc Key:", keyToStore)
-		sessionStorage.setItem('encrypted_string', encStringToStore)
-		console.log("ENC STRING FROM ENCRYPT:", sessionStorage.getItem('encrypted_string') )
+		//sessionStorage.setItem('encrypted_string', encStringToStore)
+		//console.log("ENC STRING FROM ENCRYPT:", sessionStorage.getItem('encrypted_string') )
+		return encStringToStore
   }
 
 // TO DO update Ceramic object, add encryptedstring to user_id
 
 export async function mint () {
 
-	let db_user = await JSON.parse(window.sessionStorage.getItem('db_user'))
+	const db_user = await JSON.parse(window.sessionStorage.getItem('db_user'))
 	console.log("DB USER AT BEGINNING OF NEW USER FLOW:", db_user)
 
 	await contractWithSigner.mintToken();
@@ -112,10 +113,11 @@ export async function mint () {
 	db_user.nft_info = accessControlConditions
 
 	console.log('DB USER AFTER CONTRACT CALL', db_user)
-	const db_user_string = await JSON.stringify(db_user)
+	const db_user_string = JSON.stringify(db_user)
 
-	await encrypt(db_user_string, accessControlConditions, db_user)
+	const encryptedString = await encrypt(db_user_string, accessControlConditions, db_user)
 	console.log('ENCRYPTION SUCCESSFUL')
+	return encryptedString
 	// const _event = await contractWithSigner.queryFilter("NFTMinted")
 	// console.log('TRANSFER EVENT:', _event)
 	// const api_url = '/mint'

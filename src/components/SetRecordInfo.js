@@ -14,6 +14,6 @@ export async function setDstorId(selfID) {
   // Use the SelfID instance created by the `createSelfID()` function
 	const encryptedString = await window.sessionStorage.getItem('encrypted_string')
 	console.log("ENC STRING FROM RECORD UPDATE:", encryptedString)
-  await selfID.set('basicProfile', { dstor_id: encryptedString })
+  await selfID.merge('basicProfile', { dstor_id: encryptedString })
 	console.log('ATTEMTED CERAMIC UPDATE')
 }

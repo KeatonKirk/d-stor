@@ -20,8 +20,8 @@ export default function Record(props) {
 
 	const user_info = record.isLoading
 	? 'Loading'
-	: record.content.dstor_id && !record.isMutating
-	? 'Should be done updating'
+	: record.content && !record.isMutating
+	? record.content.dstor_id
 	: 'no user id entered yet'
 
 	//console.log("DSTOR ID FROM RECORD:", record.content.dstor_id)
@@ -35,7 +35,7 @@ export default function Record(props) {
       reconnect();
     }
 		if (!record.isLoading && record.content && !record.isMutating) {
-			console.log("DSTOR ID FROM RECOR:", record.content.dstor_id )
+			console.log("DSTOR ID FROM RECOR:", record.content)
 			props.setUser(record.content.dstor_id)
 		}
 	

@@ -9,9 +9,9 @@ module.exports = {
     hardhat: {
       chainId: 1337
     },
-    ropsten: {
-      url: process.env.ROPSTEN_API_URL,
-      accounts: [process.env.ROPSTEN_PRIVATE_KEY]
+    goerli: {
+      url: process.env.GOERLI_API_URL,
+      accounts: [process.env.GOERLI_PRIVATE_KEY]
     }
   }
 };
