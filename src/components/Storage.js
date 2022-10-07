@@ -17,7 +17,6 @@ const Chainsafe = (props) => {
   client.connect();
   window.litNodeClient = client;
 
-  const encString = props.encString
 
   // const encrypt = async (stringToEncrypt) => {
   //   if (!client.litNodeClient) {
@@ -49,17 +48,20 @@ const Chainsafe = (props) => {
   
   // Decrypting string using state var
   const decrypt = async (stringToDecrypt) => {
+    console.log('ATTEMPTING DECRYPT IN STORAGE')
     if (!client.litNodeClient) {
       await client.connect()
     } 
     const db_user = await JSON.parse(sessionStorage.getItem('db_user'))
+    console.log('GOT DB USER IN STORAGE:', db_user)
     // TO DO get accessControlConditions from db_user
-    const accessControlConditions = db_user.nft_info
+    const accessControlConditions = [db_user.nft_info]
     const authSig = await props.authSig
     // convert base64 string to blob
     const encryptedString = LitJsSdk.base64StringToBlob(stringToDecrypt)
     const chain = 'ropsten'
     const encryptedSymmetricKey = db_user.encrypted_key
+    console.log('GOT ENCRYPTED SYMKEY:', encryptedSymmetricKey)
     const symmetricKey = await window.litNodeClient.getEncryptionKey({
       accessControlConditions,
       toDecrypt: encryptedSymmetricKey,

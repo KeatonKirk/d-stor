@@ -17,7 +17,7 @@ function App() {
   // If no authSig in state, attempt to get it from local storage
 
 	// useEffect(() => {
-  //   if (!authSig) {
+  //   if (!authSig && ceramic_cookie_exists) {
   //     try {
   //       setAuthSig(storedSig)
   //     } catch (error) {
@@ -25,7 +25,7 @@ function App() {
   //     } 
   //   }
   //   return
-  // }, [storedSig, authSig])
+  // }, [storedSig, authSig, ceramic_cookie_exists])
 
   console.log("App's STATE sig :", authSig)
   console.log("App's SESSION sig :", storedSig)
@@ -37,7 +37,7 @@ function App() {
     <Provider client={{ ceramic: 'testnet-clay' }}>
       <Router>
         <Routes>
-          <Route path='/' element={authSig && sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <Login2 setAuthSig={setAuthSig}/> }/>
+          <Route path='/' element={authSig && sessionStorage.getItem('db_user') && ceramic_cookie_exists ? <Navigate to='/storage' /> : <Login2 setAuthSig={setAuthSig}/> }/>
           <Route path='/storage' element={<Storage authSig={storedSig}/>}/>
         </Routes>
       </Router>

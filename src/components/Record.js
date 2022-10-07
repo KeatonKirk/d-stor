@@ -20,8 +20,8 @@ export default function Record(props) {
 
 	const user_info = record.isLoading
 	? 'Loading'
-	: record.content && !record.isMutating
-	? record.content.dstor_id
+	: record.content.dstor_id
+	? 'Welcome to the dStor Beta!'
 	: 'no user id entered yet'
 
 	//console.log("DSTOR ID FROM RECORD:", record.content.dstor_id)
@@ -45,7 +45,7 @@ export default function Record(props) {
 	
 	return (
 		<div>
-		<p>{user_info}</p>
+		<h1>{user_info}</h1>
 		</div>
 	)
 }

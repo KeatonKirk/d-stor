@@ -86,9 +86,10 @@ import {ethers} from 'ethers'
 			},
 			body: bodyString
 		});	
-		const responseString = JSON.stringify(response)
+		const responseJSON = await response.json();
+		const responseString = JSON.stringify(responseJSON.rows[0])
 		window.sessionStorage.setItem('db_user', responseString)
-		console.log("RESPONSE FROM DB UPDATE:", responseString)
+		console.log("RESPONSE FROM DB UPDATE:", responseJSON.rows[0])
 		
     // console.log("BLOB CONVERSION:", encStringToStore)
     // console.log("Enc Key:", keyToStore)
