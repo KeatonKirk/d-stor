@@ -25,6 +25,9 @@
     "web-vitals": "^2.1.4",
     "web3": "^1.8.0"
   },
+  "engines": {
+    "node" : ">=18.4.0"
+  },
   "proxy": "http://localhost:3001",
   "scripts": {
     "start": "react-scripts start",
