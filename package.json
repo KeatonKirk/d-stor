@@ -26,7 +26,8 @@
     "web3": "^1.8.0"
   },
   "engines": {
-    "node" : "18.x"
+    "node" : "18.x",
+    "npm" : "8.12.x"
   },
   "proxy": "http://localhost:3001",
   "scripts": {
