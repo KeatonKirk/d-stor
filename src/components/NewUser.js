@@ -1,5 +1,5 @@
 import LitJsSdk from "@lit-protocol/sdk-browser";
-import mintAccessNFT from './mintAccessNft.json';
+import mintAccessNFT from '.././mintAccessNft.json';
 import {ethers} from 'ethers'
 //import { useViewerRecord } from "@self.id/framework"
 //import {useRef} from "react";
