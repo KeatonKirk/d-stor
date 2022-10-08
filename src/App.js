@@ -6,7 +6,8 @@ import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-do
 import Login from "./components/Login";
 import Storage from "./components/Storage";
 import Login2 from "./components/Login2";
-
+import Register from './components/Register'
+import Home from './components/Home'
 //const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
     <Provider client={{ ceramic: 'testnet-clay' }}>
       <Router>
         <Routes>
-          <Route path='/' element={authSig && sessionStorage.getItem('db_user') && ceramic_cookie_exists ? <Navigate to='/storage' /> : <Login2 setAuthSig={setAuthSig}/> }/>
+          <Route path='/' element={<Home />}/>
+          <Route path='/login' element={authSig && window.sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <Login2 setAuthSig={setAuthSig}/> }/>
           <Route path='/storage' element={<Storage authSig={storedSig}/>}/>
         </Routes>
       </Router>

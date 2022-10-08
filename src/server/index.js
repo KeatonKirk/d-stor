@@ -138,6 +138,33 @@ res.send(updatedUser)
 console.log("UPDATED USER:", updatedUser.rows[0])
 })
 
+app.post('/get_files', async (req, res) => {
+  // get info from chainsafe
+  try {
+    const newBucket = async () => {
+      const bucket_id = req.body
+      const body = {
+        path: '/'
+      }
+      const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/ls`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
+        },
+        body: body
+      })
+      const json = await response.json()
+      console.log("list response is:", json)
+      // send session user back to client
+      res.send(json)
+    }
+    newBucket();
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 // app.get("/mint", async (req, res) => {
 //   const MintAccessNft = await hre.ethers.getContractFactory("MintAccessNft");
 //   const mintAccessNft = await MintAccessNft.deploy();

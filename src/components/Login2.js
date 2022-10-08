@@ -3,14 +3,19 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import { useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
 import {mint}from "./NewUser"
 //import { EthereumAuthProvider, SelfID } from '@self.id/web'
-//import {setDstorId, createSelfID} from './SetRecordInfo'
+// import {setDstorId, createSelfID} from './SetRecordInfo'
+// import Register from './Register'
 
 const Login = (props) => {
-	const [encString, setEncString] = useState();
+	const [loggedIn, setLoggedIn] = useState(false)
 	const [connection, connect, disconnect] = useViewerConnection();
 	const record =  useViewerRecord('basicProfile');
+	
+	const ceramic_cookie_exists = document.cookie.includes('self.id')
 
 	let db_response_body;
+	let data = JSON.parse(window.localStorage.getItem("lit-auth-signature"))
+
 	const sendSig = async (sig) => {
 		const api_url = '/connect_wallet'
 		const response =  await fetch(api_url, {
@@ -27,16 +32,31 @@ const Login = (props) => {
 		console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
 		}
 
+
+		const enterApp = async () => {
+			data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});	
+			console.log('DATA ADDRESS:', data.address)
+			const accounts = await window.ethereum.request({
+				method: 'eth_requestAccounts',
+			})
+			await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
+		}
+
+		if (!data && !ceramic_cookie_exists){
+			enterApp();
+		}
+	
+
 	const handleClick = async (e) => {
 	e.preventDefault();
 	
-
-	const data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});	
-	const accounts = await window.ethereum.request({
-		method: 'eth_requestAccounts',
-	})
-	await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
-	//const selfID = await createSelfID(accounts[0]);
+	// data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});	
+	// console.log('DATA ADDRESS:', data.address)
+	// const accounts = await window.ethereum.request({
+	// 	method: 'eth_requestAccounts',
+	// })
+	// await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
+	// //const selfID = await createSelfID(accounts[0]);
 	const sigToSend = JSON.stringify(data)
 
 	await sendSig(sigToSend)
@@ -46,26 +66,38 @@ const Login = (props) => {
 		const encryptedString = await mint();
 		window.sessionStorage.setItem('encrypted_string', encryptedString)
 		console.log("ENCRYPTED STRING IN SESS:", encryptedString)
-		try {
-			await record.merge({dstor_id: encryptedString})
-		} catch (error) {
-			alert('Woops! Looks like there was an issue connecting to the Decentralized networks. Please refresh the page and try again :)')
-		}
-			
-		
+		await record.merge({dstor_id: encryptedString})
 	}
-	//const encString = window.sessionStorage.getItem('encrypted_string')
-	
-	await props.setAuthSig(data)
-		
+	props.setAuthSig(data)
 	} 
+
+
+		// if (!record.isLoading && record.isMutable && !record.isMutating && record.content) {
+		// 	console.log('RECORD UPDATE FLOW')
+		// 	setDstorId(record)
+		// }
+
+
+	// useEffect(() => {
+	// 	if (connection.status === 'idle') {
+  //     const reconnect = async () => {
+  //       const authsig = JSON.parse(localStorage.getItem('lit-auth-signature'))
+  //       await connect(new EthereumAuthProvider(window.ethereum, authsig.address))
+  //     }
+  //     reconnect();
+  //   }
+
+	// 	return 
+	// })
+	
 
 	return (
 		<Fragment>
 			<div>
-				<h1>Welcome to dStor! Please connect your wallet to continue!</h1>
+				<h1>Almost There!</h1>
+				<p>dStor uses Self.ID to privately and securely store your information on a decentralized network. Please log in to retrieve your account.</p>
 				<form onSubmit={ handleClick }>
-					<button type='submit'>Connect Wallet</button>
+					<button type='submit'>Log In</button>
 				</form>
 			</div>
 		</Fragment>

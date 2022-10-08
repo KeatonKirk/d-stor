@@ -3,6 +3,7 @@ import {useState, useEffect, useRef} from 'react';
 import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework";
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import Record from './Record'
+import Files from './Files'
 
 
 const Chainsafe = (props) => {
@@ -124,7 +125,8 @@ const Chainsafe = (props) => {
     <div>
       <div>
         <Record setUser={setUser}/>
-        <p>{bucket_id.current ? `Your Bucket ID is: ${bucket_id.current}` : ''}</p>
+        <Files bucket_id={bucket_id.current}/>
+        {/* <p>{bucket_id.current ? `Your Bucket ID is: ${bucket_id.current}` : ''}</p> */}
       </div>
     </div>
   );

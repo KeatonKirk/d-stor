@@ -98,7 +98,6 @@ import {ethers} from 'ethers'
 		return encStringToStore
   }
 
-// TO DO update Ceramic object, add encryptedstring to user_id
 
 export async function mint () {
 
