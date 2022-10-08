@@ -26,7 +26,7 @@
     "web3": "^1.8.0"
   },
   "engines": {
-    "node" : ">=18.4.0"
+    "node" : "18.x"
   },
   "proxy": "http://localhost:3001",
   "scripts": {
