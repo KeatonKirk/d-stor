@@ -2,7 +2,7 @@ const express = require("express");
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const path = require('path');
-const pool = require("./db");
+const pool = require("./prod_db");
 //const Redis = require("redis");
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
