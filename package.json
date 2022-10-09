@@ -30,7 +30,8 @@
     "npm" : "8.12.x"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node --optimize_for_size --max_old_space_size=460 dist/main.js",
+    "startdev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "dev": "nodemon ./src/server/index.js",

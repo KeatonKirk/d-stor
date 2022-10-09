@@ -6,7 +6,7 @@ export default function Record(props) {
 	const [connection, connect, disconnect] = useViewerConnection();
 	// const user_id = useRef()
 	// const [user, setUser] = useState("");
-	const encryptedString = sessionStorage.getItem('encrypted_string')
+	//const encryptedString = sessionStorage.getItem('encrypted_string')
 
 
 	const text = record.isLoading

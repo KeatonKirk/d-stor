@@ -1,13 +1,13 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {Fragment} from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
-import { useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
+import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
 import {mint}from "./NewUser"
 //import { EthereumAuthProvider, SelfID } from '@self.id/web'
 // import {setDstorId, createSelfID} from './SetRecordInfo'
 // import Register from './Register'
 
 const Login = (props) => {
-	const [loggedIn, setLoggedIn] = useState(false)
+	// const [loggedIn, setLoggedIn] = useState(false)
 	const [connection, connect, disconnect] = useViewerConnection();
 	const record =  useViewerRecord('basicProfile');
 	
