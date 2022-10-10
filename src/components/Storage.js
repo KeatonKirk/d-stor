@@ -8,44 +8,13 @@ import Files from './Files'
 
 const Chainsafe = (props) => {
   const [connection, connect] = useViewerConnection();
-  // const [encString, setEncString] = useState();
-  // const [encKey, setEncKey] = useState();
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
-  const bucket_id = useRef("");
+  const bucket_id = useRef();
 
   const client = new LitJsSdk.LitNodeClient();
   client.connect();
   window.litNodeClient = client;
-
-
-  // const encrypt = async (stringToEncrypt) => {
-  //   if (!client.litNodeClient) {
-  //     await client.connect()
-  //   } 
-  //   const chain = 'ropsten'  
-  //   const user = await JSON.parse(sessionStorage.getItem('db_user'))
-  //   const accessControlConditions = []
-  //   accessControlConditions.push(user.nft_info) 
-  //   const authSig = await props.authSig
-  //   // encrypting a string using access control conditions and authsig from existing app state
-  //   const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(stringToEncrypt);
-  //   // step below is necessary to get key used to decrypt.
-  //   // In user retrieval use case, encrypted string would get uploaded to ceramic
-  //   // encryptedSymmmetricKey would go to database
-  //   const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
-  //     accessControlConditions,
-  //     symmetricKey,
-  //     authSig,
-  //     chain,
-  //   });
-  //   const keyToStore = LitJsSdk.uint8arrayToString(encryptedSymmetricKey, "base16")
-  //   const encStringToStore = await LitJsSdk.blobToBase64String(encryptedString)
-  //   console.log("BLOB CONVERSION:", encStringToStore)
-  //   setEncString(encStringToStore)
-  //   setEncKey(keyToStore)
-  //   console.log("Enc Key:", keyToStore)
-  // }
   
   // Decrypting string using state var
   const decrypt = async (stringToDecrypt) => {
@@ -55,7 +24,6 @@ const Chainsafe = (props) => {
     } 
     const db_user = await JSON.parse(sessionStorage.getItem('db_user'))
     console.log('GOT DB USER IN STORAGE:', db_user)
-    // TO DO get accessControlConditions from db_user
     const accessControlConditions = [db_user.nft_info]
     const authSig = await props.authSig
     // convert base64 string to blob
@@ -82,21 +50,6 @@ const Chainsafe = (props) => {
     }
   }
 
-  // Set any value in ceramic user object
-  // const SetViewerName = () => {
-  //   const record = useViewerRecord('basicProfile')
-  //   return (
-  //     <button
-  //       disabled={!record.isMutable || record.isMutating || !encString}
-  //       onClick={async () => {
-  //         await record.merge({user_id: encString });
-          
-  //       }}>
-  //     Update Profile
-  //     </button>
-  //   )
-  // }
-
   if (user) {
     decrypt(user);
   } 
@@ -104,6 +57,7 @@ const Chainsafe = (props) => {
     const user_obj = JSON.parse(string)
     const bucket = user_obj.bucket_id
     bucket_id.current = bucket
+    console.log("BUCKET ID FROM STORAGE:", typeof bucket_id.current)
   }
 
   // debugging console logs
@@ -121,12 +75,19 @@ const Chainsafe = (props) => {
     return
   },[connect, connection.status, user])
 
+  if (bucket_id.current){
+    return (
+      <div>
+        <div>
+          <Files bucket_id={bucket_id.current}/>
+        </div>
+      </div>
+    )
+  }
   return (
     <div>
       <div>
         <Record setUser={setUser}/>
-        <Files bucket_id={bucket_id.current}/>
-        {/* <p>{bucket_id.current ? `Your Bucket ID is: ${bucket_id.current}` : ''}</p> */}
       </div>
     </div>
   );

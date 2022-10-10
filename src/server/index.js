@@ -2,19 +2,16 @@ const express = require("express");
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const path = require('path');
-const pool = require("./prod_db");
+const pool = require("./db");
 //const Redis = require("redis");
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const pgSession = require('connect-pg-simple')(sessions);
 require('dotenv').config();
-//const hre = require("hardhat");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-const chain = "ropsten";
-const DEFAULT_EXP = 3600;
 const oneDay = 1000 * 60 * 60 * 24;
 
 // Have Node serve the files for our built React app
@@ -84,8 +81,7 @@ app.post("/connect_wallet", async (req, res) => {
     // add new user address to db, store user object in session
     const address_lc = await address.toLowerCase();
     const newUser = await pool.query("INSERT INTO users (address) VALUES($1) RETURNING *", [address_lc]);
-    // TO DO stringify the session user instead. user is what is sent to client.
-    //const user = JSON.stringify(newUser.rows[0]);
+
     console.log("NEW USER:", newUser.rows[0])
     session.user = newUser.rows[0];
     // create new chainsafe bucket, store info in session and push to db
@@ -140,44 +136,31 @@ console.log("UPDATED USER:", updatedUser.rows[0])
 
 app.post('/get_files', async (req, res) => {
   // get info from chainsafe
-  try {
-    const newBucket = async () => {
-      const bucket_id = req.body
-      const body = {
-        path: '/'
-      }
-      const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/ls`, {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
-        },
-        body: body
-      })
-      const json = await response.json()
-      console.log("list response is:", json)
-      // send session user back to client
-      res.send(json)
+  const body = req.body
+  const bucket_id = body.bucket_id
+  console.log( "BUCKET ID FROM CLIENT:", bucket_id)
+
+  const getFiles = async () => {
+    const body = {
+      path: '/'
     }
-    newBucket();
-  } catch (error) {
-    console.log(error)
+    const body_string = JSON.stringify(body)
+    const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/ls`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
+      },
+      body: body_string
+    })
+    const json = await response.json()
+    console.log("list response is:", json)
+    // send session user back to client
+    res.send(json)
   }
+  getFiles();
 })
 
-// app.get("/mint", async (req, res) => {
-//   const MintAccessNft = await hre.ethers.getContractFactory("MintAccessNft");
-//   const mintAccessNft = await MintAccessNft.deploy();
-
-//   await mintAccessNft.deployed();
-
-//   const tx = await mintAccessNft.emitEvent();
-//   const receipt = await tx.wait();
-//   const _id = await receipt.events[0].args['NewItemId']
-//   console.log("NFT ID", receipt.events[0].args['NewItemId'])
-//   res.send(_id)
-//   return;
-// });
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {

@@ -2,12 +2,10 @@ import React, {Fragment} from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
 import {mint}from "./NewUser"
-//import { EthereumAuthProvider, SelfID } from '@self.id/web'
-// import {setDstorId, createSelfID} from './SetRecordInfo'
-// import Register from './Register'
+
 
 const Login = (props) => {
-	// const [loggedIn, setLoggedIn] = useState(false)
+
 	const [connection, connect, disconnect] = useViewerConnection();
 	const record =  useViewerRecord('basicProfile');
 	
@@ -50,13 +48,6 @@ const Login = (props) => {
 	const handleClick = async (e) => {
 	e.preventDefault();
 	
-	// data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});	
-	// console.log('DATA ADDRESS:', data.address)
-	// const accounts = await window.ethereum.request({
-	// 	method: 'eth_requestAccounts',
-	// })
-	// await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
-	// //const selfID = await createSelfID(accounts[0]);
 	const sigToSend = JSON.stringify(data)
 
 	await sendSig(sigToSend)
@@ -71,24 +62,6 @@ const Login = (props) => {
 	props.setAuthSig(data)
 	} 
 
-
-		// if (!record.isLoading && record.isMutable && !record.isMutating && record.content) {
-		// 	console.log('RECORD UPDATE FLOW')
-		// 	setDstorId(record)
-		// }
-
-
-	// useEffect(() => {
-	// 	if (connection.status === 'idle') {
-  //     const reconnect = async () => {
-  //       const authsig = JSON.parse(localStorage.getItem('lit-auth-signature'))
-  //       await connect(new EthereumAuthProvider(window.ethereum, authsig.address))
-  //     }
-  //     reconnect();
-  //   }
-
-	// 	return 
-	// })
 	
 
 	return (

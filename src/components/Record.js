@@ -1,21 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect} from 'react';
 import { useViewerRecord, useViewerConnection, EthereumAuthProvider } from '@self.id/framework';
 
 export default function Record(props) {
 	const record = useViewerRecord('basicProfile')
-	const [connection, connect, disconnect] = useViewerConnection();
-	// const user_id = useRef()
-	// const [user, setUser] = useState("");
-	//const encryptedString = sessionStorage.getItem('encrypted_string')
-
-
-	const text = record.isLoading
-	? 'Loading...'
-	: record.content
-	? 'Welcome!'
-	: 'unsuccessful'
-
-
+	const [connection, connect] = useViewerConnection();
 
 	const user_info = record.isLoading
 	? 'Loading'
@@ -23,7 +11,6 @@ export default function Record(props) {
 	? 'My Files:'
 	: 'Woops! Looks like there was an error connecting, please refresh and connect your wallet again :)'
 
-	//console.log("DSTOR ID FROM RECORD:", record.content.dstor_id)
 
 	useEffect(() => {
 		if (connection.status === 'idle') {
@@ -37,12 +24,6 @@ export default function Record(props) {
 			console.log("DSTOR ID FROM RECOR:", record.content)
 			props.setUser(record.content.dstor_id)
 		}
-		// if (record.content.dstor_id === undefined) {
-		// 	const updateRecord = async () => {
-		// 		await record.merge({dstor_id: encryptedString})
-		// 	}
-		// 	updateRecord();
-		// }
 	
 		return
 	},[record.isLoading, props, record.content, record, connect, connection.status])

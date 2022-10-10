@@ -25,6 +25,7 @@
     "web-vitals": "^2.1.4",
     "web3": "^1.8.0"
   },
+  "proxy": "http://localhost:3001",
   "engines": {
     "node" : "18.x",
     "npm" : "8.12.x"
