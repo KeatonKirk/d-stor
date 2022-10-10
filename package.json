@@ -31,7 +31,7 @@
     "npm" : "8.12.x"
   },
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=460 src/server/index.js",
+    "start": "node src/server/index.js",
     "startdev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
