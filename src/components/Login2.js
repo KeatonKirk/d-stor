@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
-//import {mint}from "./NewUser"
+
 
 
 const Login = (props) => {
