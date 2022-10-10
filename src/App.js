@@ -1,14 +1,12 @@
-//import mintAccessNFT from './mintAccessNFT.json'
-//import { ethers, BigNumber } from "ethers";
-import { useState } from "react";
+
+import React, { useState } from "react";
 import { Provider } from '@self.id/framework';
 import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-///import Login from "./components/Login";
-import Storage from "./components/Storage";
-import Login2 from "./components/Login2";
-//import Register from './components/Register'
 import Home from './components/Home'
-//const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+
+const LazyLogin = React.lazy(() => import ("./components/Login2"))
+const LazyStorage = React.lazy(() => import ("./components/Storage"))
+
 
 function App() {
   const [authSig, setAuthSig] = useState(null)
@@ -37,11 +35,14 @@ function App() {
   return (
     <Provider client={{ ceramic: 'testnet-clay' }}>
       <Router>
+        <React.Suspense fallback='Loading...'>
         <Routes>
           <Route path='/' element={<Home />}/>
-          <Route path='/login' element={authSig && window.sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <Login2 setAuthSig={setAuthSig}/> }/>
-          <Route path='/storage' element={<Storage authSig={storedSig}/>}/>
+          <Route path='/login' element={authSig && window.sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <LazyLogin setAuthSig={setAuthSig}/> }/>
+          <Route path='/storage' element={<LazyStorage authSig={storedSig}/>}/>
+          
         </Routes>
+        </React.Suspense>
       </Router>
     </Provider>
   )

@@ -14,9 +14,6 @@ import {ethers} from 'ethers'
 // this should push access control conditions and encryptedSymmetricKey to database
 
 	const contractAddress = '0xAbaDf831858e31AcBc58A0B4d4997488d78f5FcF'
-	
-	// let db_user = JSON.parse(window.sessionStorage.getItem('db_user'))
-	// console.log("DB USER AT BEGINNING OF NEW USER FLOW:", db_user)
 
 	const provider = new ethers.providers.Web3Provider(window.ethereum)
 	const signer =  provider.getSigner();
@@ -53,7 +50,6 @@ import {ethers} from 'ethers'
     } 
 
     const chain = 'goerli'  
-    // const user = await JSON.parse(sessionStorage.getItem('db_user'))
     const authSig = await JSON.parse(window.localStorage.getItem("lit-auth-signature"))
     // encrypting a string using access control conditions and authsig from existing app state
     const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(stringToEncrypt);

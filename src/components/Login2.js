@@ -1,7 +1,7 @@
 import React, {Fragment} from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
-import {mint}from "./NewUser"
+//import {mint}from "./NewUser"
 
 
 const Login = (props) => {
@@ -54,10 +54,12 @@ const Login = (props) => {
 
 	if (!db_response_body.encrypted_key){
 		console.log('NEW USER FLOW STARTED')
+		const {mint} = await import('./NewUser')
 		const encryptedString = await mint();
 		window.sessionStorage.setItem('encrypted_string', encryptedString)
 		console.log("ENCRYPTED STRING IN SESS:", encryptedString)
 		await record.merge({dstor_id: encryptedString})
+	 
 	}
 	props.setAuthSig(data)
 	} 
