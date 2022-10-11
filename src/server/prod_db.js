@@ -1,11 +1,14 @@
-const Pool = require('pg').Pool;
+const { Client } = require('pg');
+require('dotenv').config();
 
-const pool = new Pool({
-	user: "cgnynplhreuchm",
-	host: "ec2-18-215-96-22.compute-1.amazonaws.com",
-	port: "5432",
-	database: "d7seg3f4g4g0r8"
-})
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+client.connect();
 
 
-module.exports = pool; 
+module.exports = client; 

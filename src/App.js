@@ -4,7 +4,7 @@ import { Provider } from '@self.id/framework';
 import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './components/Home'
 
-const LazyLogin = React.lazy(() => import ("./components/Login2"))
+const LazyLogin = React.lazy(() => import ("./components/Login"))
 const LazyStorage = React.lazy(() => import ("./components/Storage"))
 
 
@@ -40,7 +40,6 @@ function App() {
           <Route path='/' element={<Home />}/>
           <Route path='/login' element={authSig && window.sessionStorage.getItem('db_user') ? <Navigate to='/storage' /> : <LazyLogin setAuthSig={setAuthSig}/> }/>
           <Route path='/storage' element={<LazyStorage authSig={storedSig}/>}/>
-          
         </Routes>
         </React.Suspense>
       </Router>

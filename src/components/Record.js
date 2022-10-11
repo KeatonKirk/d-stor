@@ -21,7 +21,7 @@ export default function Record(props) {
       reconnect();
     }
 		if (!record.isLoading && record.content && !record.isMutating && record.content.dstor_id) {
-			console.log("DSTOR ID FROM RECOR:", record.content)
+			console.log("DSTOR ID FROM RECORD:", record.content)
 			props.setUser(record.content.dstor_id)
 		}
 	
@@ -30,8 +30,6 @@ export default function Record(props) {
 	
 	
 	return (
-		<div>
-		<h1>{user_info}</h1>
-		</div>
+		<div>loading, please wait</div>
 	)
 }

@@ -4,6 +4,7 @@ import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework";
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import Record from './Record'
 import Files from './Files'
+import Upload from './Upload'
 
 
 const Chainsafe = (props) => {
@@ -11,6 +12,7 @@ const Chainsafe = (props) => {
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
   const bucket_id = useRef();
+  const files = useRef();
 
   const client = new LitJsSdk.LitNodeClient();
   client.connect();
@@ -56,12 +58,11 @@ const Chainsafe = (props) => {
   if (string){
     const user_obj = JSON.parse(string)
     const bucket = user_obj.bucket_id
+    const userObjFiles = user_obj.files
     bucket_id.current = bucket
-    console.log("BUCKET ID FROM STORAGE:", typeof bucket_id.current)
+    files.current = userObjFiles
+    // need to add logic here that makes file list accessible
   }
-
-  // debugging console logs
-  console.log('DRUM ROLL!!!!! DECRYPTED STRING IS:', string)
 
   useEffect(() => {
     // make sure there is a connection to ceramic, if not, reconnect using address from stored authSig
@@ -79,6 +80,8 @@ const Chainsafe = (props) => {
     return (
       <div>
         <div>
+          <Upload bucket_id={bucket_id.current}/>
+          <br></br>
           <Files bucket_id={bucket_id.current}/>
         </div>
       </div>
