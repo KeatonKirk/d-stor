@@ -15,7 +15,7 @@ const app = express();
 const oneDay = 1000 * 60 * 60 * 24;
 
 // Have Node serve the files for our built React app
-app.use(express.static(path.resolve(__dirname, '~/build')));
+app.use(express.static(path.resolve(__dirname, '../../build')));
 app.use(express.json());
 app.use(sessions({
   store: new pgSession({
@@ -164,7 +164,7 @@ app.post('/get_files', async (req, res) => {
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '~/build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '../../build', 'index.html'));
   });
 
 app.listen(PORT, () => {
