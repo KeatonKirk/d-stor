@@ -167,13 +167,19 @@ app.post('/get_files', async (req, res) => {
 
   app.post('/download', async (req, res) => {
     const {bucket_id, file_path} = req.body
-    const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/download`, {
+    try{
+      const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/download`, {
       method: 'post',
       headers: {
         "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
       },
       body: file_path
     })
+    console.log(response)
+    } catch (err) {
+      console.log(err)
+    }
+
     
     //console.log('response from upload is:', response)
     //res.send(json)
