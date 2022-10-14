@@ -47,7 +47,7 @@ const Files = (props) => {
 				<h2>My Files:</h2>
 					{files.current.map(file => (
 						<>
-						<p key={file}>{file}</p><Download files={prop_files} />
+						<p key={file}>{file}</p><Download bucket_id={bucket_id_obj} file_name={file} files={prop_files} />
 						</>
 					))}
 			</div>

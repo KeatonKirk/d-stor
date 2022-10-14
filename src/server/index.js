@@ -136,6 +136,7 @@ app.post('/get_files', async (req, res) => {
 
 
   async function uploadFile(req,res) {
+    try {
     console.log('GOT TO FILE UPLOAD')
     const file = req.file
     const uploadFile = fs.createReadStream(file.path)
@@ -157,9 +158,26 @@ app.post('/get_files', async (req, res) => {
     const json = await JSON.stringify(file.path);
     //console.log('response from upload is:', response)
     res.send(json)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   app.post('/upload', upload.single('file'), uploadFile);
+
+  app.post('/download', async (req, res) => {
+    const {bucket_id, file_path} = req.body
+    const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/download`, {
+      method: 'post',
+      headers: {
+        "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
+      },
+      body: file_path
+    })
+    
+    //console.log('response from upload is:', response)
+    //res.send(json)
+  })
 
 
 // All other GET requests not handled before will return our React app
