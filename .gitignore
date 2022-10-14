@@ -28,7 +28,6 @@ coverage
 coverage.json
 typechain
 typechain-types
-/server/uploads
 
 #Hardhat files
 cache
