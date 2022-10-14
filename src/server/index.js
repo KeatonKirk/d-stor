@@ -157,7 +157,6 @@ app.post('/get_files', async (req, res) => {
     const json = await JSON.stringify(file.path);
     //console.log('response from upload is:', response)
     res.send(json)
-    fs.unlink(file.path)
   }
 
   app.post('/upload', upload.single('file'), uploadFile);
