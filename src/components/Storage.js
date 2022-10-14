@@ -12,6 +12,7 @@ const Chainsafe = (props) => {
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
   const bucket_id = useRef();
+  const user_obj = useRef();
   const files = useRef();
 
   const client = new LitJsSdk.LitNodeClient();
@@ -56,12 +57,16 @@ const Chainsafe = (props) => {
     decrypt(user);
   } 
   if (string){
-    const user_obj = JSON.parse(string)
-    const bucket = user_obj.bucket_id
-    const userObjFiles = user_obj.files
+    const user_obj_json = JSON.parse(string)
+    const bucket = user_obj_json.bucket_id
+    
     bucket_id.current = bucket
-    files.current = userObjFiles
+    user_obj.current = user_obj_json
     // need to add logic here that makes file list accessible
+  }
+  if (user_obj.current) {
+    files.current = user_obj.current.files
+    console.log('FILES FROM STORAGE COMP:', files )
   }
 
   useEffect(() => {
@@ -80,9 +85,9 @@ const Chainsafe = (props) => {
     return (
       <div>
         <div>
-          <Upload bucket_id={bucket_id.current}/>
+          <Upload bucket_id={bucket_id.current} user_obj={user_obj.current}/>
           <br></br>
-          <Files bucket_id={bucket_id.current}/>
+          <Files bucket_id={bucket_id.current} files={files.current}/>
         </div>
       </div>
     )

@@ -2,11 +2,14 @@ const express = require("express");
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const path = require('path');
+const multer = require('multer')
+const upload = multer({dest: "uploads/"})
+const FormData = require('form-data')
+const form = new FormData()
+const fs = require('fs');
 //const pool = require("./db");
 const client = require("./prod_db")
 const cookieParser = require("cookie-parser");
-//const sessions = require('express-session');
-//const pgSession = require('connect-pg-simple')(sessions);
 require('dotenv').config();
 
 
@@ -19,22 +22,8 @@ const app = express();
 // Have Node serve the files for our built React app
 app.use(express.static(path.resolve(__dirname, '../../build')));
 app.use(express.json());
-// app.use(sessions({
-//   store: new pgSession({
-//     pool: pool,
-//     tableName: 'session'
-//   }),
-//   secret: "SeCrEtKeY",
-//   saveUninitialized: false,
-//   cookie: { 
-//     maxAge: oneDay,
-//     secure: true,
-//     sameSite: true },
-//   resave: false
-// }));
-app.use(cookieParser());
 
-//var session;
+app.use(cookieParser());
 
 // Add user to psql db
 app.post("/add_user", async (req, res) => {
@@ -42,7 +31,7 @@ app.post("/add_user", async (req, res) => {
   try{
     const {address, stream_id, bucket_id, encrypted_key, ceramic_info, nft_info} = req.body;
     const address_lc = await address.toLowerCase();
-    const newUser = await pool.query("INSERT INTO users (address, stream_id, bucket_id, encrypted_key, ceramic_info, nft_info) VALUES($1, $2, $3, $4, $5, $6) RETURNING *", [address_lc, stream_id, bucket_id, encrypted_key, ceramic_info, nft_info]);
+    const newUser = await client.query("INSERT INTO users (address, stream_id, bucket_id, encrypted_key, ceramic_info, nft_info) VALUES($1, $2, $3, $4, $5, $6) RETURNING *", [address_lc, stream_id, bucket_id, encrypted_key, ceramic_info, nft_info]);
     const user = JSON.stringify(newUser.rows[0]);
     console.log("user added to db and retrieved")
     res.send(user)
@@ -85,7 +74,7 @@ app.post("/connect_wallet", async (req, res) => {
         const json = await response.json()
         user.bucket_id = await json.id
         console.log("SESSION USER IS:", user)
-        // send session user back to client
+        // send user back to client
         res.send(user)
       }
       newBucket();
@@ -143,29 +132,35 @@ app.post('/get_files', async (req, res) => {
   getFiles();
 })
 
-app.post('/upload', (req, res) => {
-  // chainsafe upload logic
-  const {file, path, bucket_id}  = req.body
-  const body = {
-    file: file,
-    path: path
-  }
-  const body_string = JSON.stringify(body)
-  const uploadFile = async () => {
+
+
+
+  async function uploadFile(req,res) {
+    console.log('GOT TO FILE UPLOAD')
+    const file = req.file
+    const uploadFile = fs.createReadStream(file.path)
+    console.log('UPLOAD FILE:', uploadFile)
+    const {file_name, bucket_id}  = req.body
+    file.filename = file_name
+    form.append('file', uploadFile)
+    const headers = form.getHeaders()
+    
+    console.log('FILE AND BUCKET ID FROM CLIENT REQUEST:', file, file_name, bucket_id)
     const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, {
       method: 'post',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
+        "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
+        headers
       },
-      body: body_string
-  })
-  const json = response.json();
-  console.log('response from upload is:', json)
-  res.send(json)
+      body: form
+    })
+    const json = await JSON.stringify(file.path);
+    //console.log('response from upload is:', response)
+    res.send(json)
+    fs.unlink(file.path)
   }
-  uploadFile()
-})
+
+  app.post('/upload', upload.single('file'), uploadFile);
 
 
 // All other GET requests not handled before will return our React app

@@ -90,10 +90,9 @@ export async function mint () {
 	const tokenId = ethers.BigNumber.from(bigNumTokenId).toNumber()
 	const tokenIdString = tokenId.toString();
 	accessControlConditions[0].parameters.push(tokenIdString)
-	console.log("DB USER IN MINT", db_user)
 	db_user.nft_info = accessControlConditions
 	db_user.files = {}
-
+	
 	console.log('DB USER AFTER CONTRACT CALL', db_user)
 	const db_user_string = JSON.stringify(db_user)
 

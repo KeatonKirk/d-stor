@@ -11,22 +11,27 @@ import { useViewerRecord } from "@self.id/framework"
 
 function Upload(props) {
 	const [file, setFile] = useState()
+	const [upload, setUpload] = useState(false)
 	const record = useViewerRecord('basicProfile')
 	
-	const encryptFile = async (fileToEncrypt) => {
+	const encryptFile = async (file) => {
 		const client = await new LitJsSdk.LitNodeClient();
 		client.connect();
 		window.litNodeClient = client;
     if (!client.litNodeClient) {
       await client.connect()
     } 
-		const db_user = await JSON.parse(sessionStorage.getItem('db_user'))
-		const accessControlConditions = [db_user.nft_info]
+		console.log('FILE NAME FROM UPLOAD:', file.name)
+		const user = props.user_obj
+		const accessControlConditions = user.nft_info
     const chain = 'goerli'  
+		//let files = user.files
+		const file_name = file.name
+		console.log('FILES FROM DBUSER:', user, user.files)
     const authSig = await JSON.parse(window.localStorage.getItem("lit-auth-signature"))
     // encryptedFile gets sent to server to upload via chainsafe
-		console.log('FILE FROM ENCRYPT FILE:', fileToEncrypt)
-    const { encryptedFile, symmetricKey } = await LitJsSdk.encryptFile(fileToEncrypt);
+		console.log('FILE FROM ENCRYPT FILE:', file)
+    const { encryptedFile, symmetricKey } = await LitJsSdk.encryptFile({file: file });
 		// encryptedSymmetricKey and file name get added as key-value pair to db_user files object
     const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
       accessControlConditions,
@@ -34,70 +39,83 @@ function Upload(props) {
       authSig,
       chain,
     });
+		console.log('ENCRYPTED FILE!!!:', encryptedFile)
+		const keyToStore = LitJsSdk.uint8arrayToString(encryptedSymmetricKey, "base16")
 
-		db_user.files.fileToEncrypt.name = encryptedSymmetricKey;
-		const user_string = JSON.stringify(db_user)
+		user.files[file_name] = [keyToStore];
+
+		const user_string = JSON.stringify(user)
 		window.sessionStorage.setItem('db_user', user_string)
-		console.log('DB USER AFTER UPLOAD:', db_user)
-		const fileToUpload = [encryptedFile]
+		console.log('DB USER AFTER UPLOAD:', user)
+		//const fileToUpload = [encryptedFile]
 
-		// TO DO finish upload logic for server proxy
-		const body = {
-			file: fileToUpload,
-			path: '/',
-			bucket_id: props.bucket_id
-		}
 
-		const body_string = JSON.stringify(body)
+
+		const formData = new FormData()
+		formData.append('file', encryptedFile)
+		formData.append('bucket_id', props.bucket_id)
+		formData.append('file_name', file.name)
+
+		console.log('FORM DATA:', formData)
+		// const body = {
+		// 	file: formData,
+		// 	path: '/',
+		// 	bucket_id: props.bucket_id
+		// }
+
+		//const body_string = JSON.stringify(body)
 		const api_url = '/upload'
 		const response =  await fetch(api_url, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: body_string
+			body: formData
 		});	
 		const responseJSON = await response.json();
-		const responseString = JSON.stringify(responseJSON.rows[0])
+		//const responseString = JSON.stringify(responseJSON.rows[0])
 		
-		console.log("RESPONSE FROM DB UPDATE:", responseJSON.rows[0])
+		console.log("RESPONSE FROM Upload:", responseJSON)
+		const upload_name = responseJSON.replace('uploads/', '')
+		console.log('UPLOAD NAME:', upload_name)
+		user.files[file_name].push(upload_name)
+		console.log('USER FILES WITH UPLOAD NAME:', user.files)
 
 		const stringToEncrypt = window.sessionStorage.getItem('db_user')
+		console.log('ACCESS CONTROL CONDITIONS:', accessControlConditions)
 
-		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, db_user)
-
+		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
+		
 		// this should:
 		// take the updated user object with new file in files object,
 		// encrypt it, 
 		// upload the new encrypted user key to the db
 		// update the ceramic record dstor_id
+		setUpload(true)
 
 		return userStringToStore
 		
 	}
 
 	const handleChange = async (e) => {
+
 		setFile(e.target.files[0])
+		
 	}
 
-	const handleSubmit =  async (e) => {
-		e.preventDefault()
-		console.log('FILE FROM STATE IN UPLOAD:', file)
+	const handleSubmit =  async () => {
+		// const formData = new FormData();
+		// formData.append('File', file)
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
-
-		const encStringToStore = await encryptFile(file)
-		await record.merge({dstor_id: encStringToStore})
-
-		console.log(file)
+		const userStringToStore = await encryptFile(file)
+		console.log("USER STRING TO STORE AFTER ENCRYPT", userStringToStore)
+		await record.merge({dstor_id: userStringToStore})
+		console.log('RECORD AFTER ENCRYPT', record)
 	}
 	return (
 		<div>
 			<h2>Upload New File</h2>
-        <form onSubmit={handleSubmit}>
-          <input type="file" onChange={handleChange}/>
-          <button disabled={!file} type="submit">Upload</button>
-        </form>
+
+          <input id='input' type="file" onChange={handleChange}/>
+          <button disabled={!file} onClick={handleSubmit}>Upload</button>
 		</div>
 	)
 }
