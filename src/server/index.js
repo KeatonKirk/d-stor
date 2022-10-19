@@ -136,11 +136,8 @@ app.post('/get_files', async (req, res) => {
     try {
     console.log('GOT TO FILE UPLOAD')
     const file = req.file
-    console.log('RAW FILE FROM CLIENT UPLOAD:', file)
     const uploadFile = fs.createReadStream(file.path)
-    console.log('UPLOAD FILE:', uploadFile)
     const {file_name, bucket_id}  = req.body
-    //file.filename = file_name
     form.append('file', uploadFile)
     const headers = form.getHeaders()
     
@@ -154,7 +151,7 @@ app.post('/get_files', async (req, res) => {
       body: form
     })
     const json = JSON.stringify(file.path);
-    //console.log('response from upload is:', response)
+
     await res.send(json)
     fs.unlink('uploads/' + file.filename, (err) => {
       if (err) {
@@ -162,6 +159,7 @@ app.post('/get_files', async (req, res) => {
       }
       console.log("Delete Upload successfully.");
   });
+  res.end()
     } catch (err) {
       console.log(err)
     }
@@ -171,9 +169,7 @@ app.post('/get_files', async (req, res) => {
 
   app.post('/download', async (req, res) => {
     const {bucket_id, file_path, file_name} = req.body
-    console.log('INFO FROM CLIENT DOWNLOAD REQUEST', req.body)
     const file_path_string = '/' + file_path;
-    console.log('UPDATED FILEPATH:', file_path_string)
     
     const body = {
       path: file_path_string
@@ -199,12 +195,10 @@ app.post('/get_files', async (req, res) => {
         });
     });
     await res.download('downloads/' + file_name)
-
     
     } catch (err) {
       console.log(err)
     }
-    
   })
 
 
@@ -221,9 +215,8 @@ app.post('/get_files', async (req, res) => {
     } catch (error) {
       console.log(error)
     }
-    
-
   })
+
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../../build', 'index.html'));
