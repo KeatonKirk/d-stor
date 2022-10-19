@@ -7,7 +7,6 @@ const upload = multer({dest: "uploads/"})
 const FormData = require('form-data')
 const form = new FormData()
 const fs = require('fs');
-const FileReader = require('filereader')
 //const pool = require("./db");
 const client = require("./prod_db")
 const cookieParser = require("cookie-parser");
@@ -146,7 +145,7 @@ app.post('/get_files', async (req, res) => {
     const headers = form.getHeaders()
     
     console.log('FILE AND BUCKET ID FROM CLIENT REQUEST:', file, file_name, bucket_id)
-    const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, {
+     await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, {
       method: 'post',
       headers: {
         "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
@@ -154,14 +153,13 @@ app.post('/get_files', async (req, res) => {
       },
       body: form
     })
-    const json = await JSON.stringify(file.path);
+    const json = JSON.stringify(file.path);
     //console.log('response from upload is:', response)
-    res.send(json)
+    await res.send(json)
     fs.unlink('uploads/' + file.filename, (err) => {
       if (err) {
           throw err;
       }
-  
       console.log("Delete Upload successfully.");
   });
     } catch (err) {
@@ -216,6 +214,16 @@ app.post('/get_files', async (req, res) => {
   })
 
 
+  app.post('/unlink_download', async (req, res) => {
+    const {file_name} = req.body
+    console.log(file_name)
+      fs.unlink('downloads/' + file_name, (err) => {
+        if (err) {
+            throw err;
+        }
+          console.log("Delete Download successfully.");
+      });
+  })
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../../build', 'index.html'));

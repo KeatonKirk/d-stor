@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import {encryptUser} from './EncryptUser'
 import { useViewerRecord } from "@self.id/framework"
-import {decryptFile} from './DecryptFile'
+
 // take file input from user
 // encrypt file with lit
 // call server to proxy upload call to chainsafe api
@@ -10,7 +10,6 @@ import {decryptFile} from './DecryptFile'
 
 function Upload(props) {
 	const [file, setFile] = useState()
-	const [upload, setUpload] = useState(false)
 	const record = useViewerRecord('basicProfile')
 	
 	const encryptFile = async (file) => {
@@ -52,18 +51,6 @@ function Upload(props) {
 		formData.append('file', encryptedFile)
 		formData.append('bucket_id', props.bucket_id)
 		formData.append('file_name', file.name)
-
-		const base64String = await LitJsSdk.blobToBase64String(encryptedFile)
-		const uint8array = await LitJsSdk.uint8arrayFromString(base64String)
-
-		console.log('FORM DATA:', formData)
-		const body = {
-			file: base64String,
-			file_name: file.name,
-			bucket_id: props.bucket_id
-		}
-
-		console.log(body)
 
 		const api_url = '/upload'
 		const response =  await fetch(api_url, {

@@ -29,6 +29,16 @@ export async function decryptFile (encryptedFile, encryptedSymmetricKey, fileNam
 			mimetype: 'application/octet-stream'
 		})
 		console.log(decryptedFile)
+		const body = {
+			file_name: fileName
+		}
+		await fetch('/unlink_download', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(body)
+		});	
 
 		return decryptedFile
   }

@@ -68,7 +68,7 @@ const Login = (props) => {
 				<h1>Almost There!</h1>
 				<p>dStor uses Self.ID to privately and securely store your information on a decentralized network. Please log in to retrieve your account.</p>
 				<form onSubmit={ handleClick }>
-					<button disabled={!data && !ceramic_cookie_exists} type='submit'>Log In</button>
+					<button disabled={!data || !ceramic_cookie_exists} type='submit'>Log In</button>
 				</form>
 			</div>
 		</Fragment>

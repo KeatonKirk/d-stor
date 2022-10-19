@@ -1,4 +1,4 @@
-import LitJsSdk from "@lit-protocol/sdk-browser";
+
 import mintAccessNFT from '.././mintAccessNft.json';
 import {ethers} from 'ethers'
 import {encryptUser} from './EncryptUser'
