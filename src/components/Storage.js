@@ -7,7 +7,7 @@ import Files from './Files'
 import Upload from './Upload'
 
 
-const Chainsafe = (props) => {
+const Storage = (props) => {
   const [connection, connect] = useViewerConnection();
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
@@ -62,12 +62,13 @@ const Chainsafe = (props) => {
     
     bucket_id.current = bucket
     user_obj.current = user_obj_json
+    files.current = user_obj_json.files
     // need to add logic here that makes file list accessible
   }
-  if (user_obj.current) {
-    files.current = user_obj.current.files
-    console.log('FILES FROM STORAGE COMP:', files )
-  }
+  // if (user_obj.current) {
+    
+  //   console.log('FILES FROM STORAGE COMP:', files )
+  // }
 
   useEffect(() => {
     // make sure there is a connection to ceramic, if not, reconnect using address from stored authSig
@@ -101,4 +102,4 @@ const Chainsafe = (props) => {
   );
 };
 
-export default Chainsafe;
+export default Storage;

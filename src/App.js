@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Provider } from '@self.id/framework';
 import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './components/Home'
@@ -15,16 +15,16 @@ function App() {
 
   // If no authSig in state, attempt to get it from local storage
 
-	// useEffect(() => {
-  //   if (!authSig && ceramic_cookie_exists) {
-  //     try {
-  //       setAuthSig(storedSig)
-  //     } catch (error) {
-  //       console.error(error)
-  //     } 
-  //   }
-  //   return
-  // }, [storedSig, authSig, ceramic_cookie_exists])
+	useEffect(() => {
+    if (!authSig && ceramic_cookie_exists) {
+      try {
+        setAuthSig(storedSig)
+      } catch (error) {
+        console.error(error)
+      } 
+    }
+    return
+  }, [storedSig, authSig, ceramic_cookie_exists])
 
   console.log("App's STATE sig :", authSig)
   console.log("App's SESSION sig :", storedSig)

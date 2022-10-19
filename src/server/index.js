@@ -7,6 +7,7 @@ const upload = multer({dest: "uploads/"})
 const FormData = require('form-data')
 const form = new FormData()
 const fs = require('fs');
+const FileReader = require('filereader')
 //const pool = require("./db");
 const client = require("./prod_db")
 const cookieParser = require("cookie-parser");
@@ -132,17 +133,15 @@ app.post('/get_files', async (req, res) => {
   getFiles();
 })
 
-
-
-
   async function uploadFile(req,res) {
     try {
     console.log('GOT TO FILE UPLOAD')
     const file = req.file
+    console.log('RAW FILE FROM CLIENT UPLOAD:', file)
     const uploadFile = fs.createReadStream(file.path)
     console.log('UPLOAD FILE:', uploadFile)
     const {file_name, bucket_id}  = req.body
-    file.filename = file_name
+    //file.filename = file_name
     form.append('file', uploadFile)
     const headers = form.getHeaders()
     
@@ -158,6 +157,13 @@ app.post('/get_files', async (req, res) => {
     const json = await JSON.stringify(file.path);
     //console.log('response from upload is:', response)
     res.send(json)
+    fs.unlink('uploads/' + file.filename, (err) => {
+      if (err) {
+          throw err;
+      }
+  
+      console.log("Delete Upload successfully.");
+  });
     } catch (err) {
       console.log(err)
     }
@@ -166,23 +172,47 @@ app.post('/get_files', async (req, res) => {
   app.post('/upload', upload.single('file'), uploadFile);
 
   app.post('/download', async (req, res) => {
-    const {bucket_id, file_path} = req.body
+    const {bucket_id, file_path, file_name} = req.body
+    console.log('INFO FROM CLIENT DOWNLOAD REQUEST', req.body)
+    const file_path_string = '/' + file_path;
+    console.log('UPDATED FILEPATH:', file_path_string)
+    
+    const body = {
+      path: file_path_string
+    }
+
     try{
       const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/download`, {
       method: 'post',
       headers: {
         "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
+        "Content-Type": 'application/json'
       },
-      body: file_path
+      body: JSON.stringify(body)
     })
-    console.log(response)
+
+    const fileStream = await fs.createWriteStream('downloads/' + file_name);
+     await new Promise((resolve, reject) => {
+      response.body.pipe(fileStream);
+      response.body.on("error", reject);
+        fileStream.on("finish", () => {
+            fileStream.close()
+            resolve()
+        });
+    });
+    await res.download('downloads/' + file_name)
+
+    
     } catch (err) {
       console.log(err)
     }
-
+    // fs.unlink('downloads/' + file_name, (err) => {
+    //   if (err) {
+    //       throw err;
+    //   }
+    //     console.log("Delete Download successfully.");
+    // });
     
-    //console.log('response from upload is:', response)
-    //res.send(json)
   })
 
 
