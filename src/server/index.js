@@ -5,7 +5,7 @@ const path = require('path');
 const multer = require('multer')
 const upload = multer({dest: "uploads/"})
 const FormData = require('form-data')
-const form = new FormData()
+
 const fs = require('fs');
 //const pool = require("./db");
 const client = require("./prod_db")
@@ -137,11 +137,11 @@ app.post('/get_files', async (req, res) => {
     console.log('GOT TO FILE UPLOAD')
     const file = req.file
     const uploadFile = fs.createReadStream(file.path)
-    const {file_name, bucket_id}  = req.body
+    const {bucket_id}  = req.body
+    const form = new FormData()
     form.append('file', uploadFile)
     const headers = form.getHeaders()
     
-    console.log('FILE AND BUCKET ID FROM CLIENT REQUEST:', file, file_name, bucket_id)
      await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, {
       method: 'post',
       headers: {
@@ -168,14 +168,12 @@ app.post('/get_files', async (req, res) => {
   app.post('/upload', upload.single('file'), uploadFile);
 
   app.post('/download', async (req, res) => {
-    const {bucket_id, file_path, file_name} = req.body
-    const file_path_string = '/' + file_path;
-    
-    const body = {
-      path: file_path_string
-    }
-
     try{
+      const {bucket_id, file_path, file_name} = req.body
+      const file_path_string = '/' + file_path;
+      const body = {
+        path: file_path_string
+      }
       const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/download`, {
       method: 'post',
       headers: {
@@ -203,15 +201,16 @@ app.post('/get_files', async (req, res) => {
 
 
   app.post('/unlink_download', async (req, res) => {
-    const {file_name} = req.body
-    console.log(file_name)
     try {
-            fs.unlink('downloads/' + file_name, (err) => {
+      const {file_name} = req.body
+      console.log(file_name)
+      fs.unlink('downloads/' + file_name, (err) => {
         if (err) {
             throw err;
         }
           console.log("Delete Download successfully.");
       });
+      res.end()
     } catch (error) {
       console.log(error)
     }
