@@ -33,9 +33,22 @@ const handleClick = async () => {
 	try {
 		const decryptedFile = await decryptFile(encryptedFile, encryptedSymmetricKey, props.file_name)
 		console.log('DECRYPTED FILE ATTEMPT:', decryptedFile)
+
 	}catch (err){
 		console.log(err)
 	}
+	try {
+		await fetch('/unlink_download', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(body)
+		});	
+	} catch(error) {
+		console.log(error)
+	}
+
 
 }
 	return (

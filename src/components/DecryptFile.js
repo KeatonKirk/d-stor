@@ -23,7 +23,7 @@ export async function decryptFile (encryptedFile, encryptedSymmetricKey, fileNam
 		const decryptedFile =  await LitJsSdk.decryptFile({file: encryptedFile, symmetricKey})
 		const uint8View = new Uint8Array(decryptedFile);
 		console.log('DECRYPTED FILE FROM UPLOAD:', uint8View)
-		await LitJsSdk.downloadFile({
+		const downloaded_file = await LitJsSdk.downloadFile({
 			filename: fileName, 
 			data: uint8View, 
 			mimetype: 'application/octet-stream'
@@ -32,13 +32,7 @@ export async function decryptFile (encryptedFile, encryptedSymmetricKey, fileNam
 		const body = {
 			file_name: fileName
 		}
-		await fetch('/unlink_download', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(body)
-		});	
+
 
 		return decryptedFile
   }
