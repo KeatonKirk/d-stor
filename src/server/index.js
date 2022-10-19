@@ -204,12 +204,6 @@ app.post('/get_files', async (req, res) => {
     } catch (err) {
       console.log(err)
     }
-    // fs.unlink('downloads/' + file_name, (err) => {
-    //   if (err) {
-    //       throw err;
-    //   }
-    //     console.log("Delete Download successfully.");
-    // });
     
   })
 
@@ -217,12 +211,18 @@ app.post('/get_files', async (req, res) => {
   app.post('/unlink_download', async (req, res) => {
     const {file_name} = req.body
     console.log(file_name)
-      fs.unlink('downloads/' + file_name, (err) => {
+    try {
+            fs.unlink('downloads/' + file_name, (err) => {
         if (err) {
             throw err;
         }
           console.log("Delete Download successfully.");
       });
+    } catch (error) {
+      console.log(error)
+    }
+    
+
   })
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
