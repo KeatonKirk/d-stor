@@ -48,8 +48,6 @@ const handleClick = async () => {
 	} catch(error) {
 		console.log(error)
 	}
-
-
 }
 	return (
 		<>

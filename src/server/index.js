@@ -7,7 +7,6 @@ const upload = multer({dest: "uploads/"})
 const FormData = require('form-data')
 
 const fs = require('fs');
-//const pool = require("./db");
 const client = require("./prod_db")
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
@@ -159,7 +158,6 @@ app.post('/get_files', async (req, res) => {
       }
       console.log("Delete Upload successfully.");
   });
-  res.end()
     } catch (err) {
       console.log(err)
     }
@@ -210,7 +208,6 @@ app.post('/get_files', async (req, res) => {
         }
           console.log("Delete Download successfully.");
       });
-      res.end()
     } catch (error) {
       console.log(error)
     }

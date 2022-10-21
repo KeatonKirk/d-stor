@@ -8,7 +8,7 @@ const LazyLogin = React.lazy(() => import ("./components/Login"))
 const LazyStorage = React.lazy(() => import ("./components/Storage"))
 
 
-function App() {
+function App( {children}) {
   const [authSig, setAuthSig] = useState(null)
   const storedSig = JSON.parse(window.localStorage.getItem("lit-auth-signature"));
   const ceramic_cookie_exists = document.cookie.includes('self.id')

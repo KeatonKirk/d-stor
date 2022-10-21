@@ -23,15 +23,12 @@ export async function decryptFile (encryptedFile, encryptedSymmetricKey, fileNam
 		const decryptedFile =  await LitJsSdk.decryptFile({file: encryptedFile, symmetricKey})
 		const uint8View = new Uint8Array(decryptedFile);
 		console.log('DECRYPTED FILE FROM UPLOAD:', uint8View)
-		const downloaded_file = await LitJsSdk.downloadFile({
+		await LitJsSdk.downloadFile({
 			filename: fileName, 
 			data: uint8View, 
 			mimetype: 'application/octet-stream'
 		})
 		console.log(decryptedFile)
-		const body = {
-			file_name: fileName
-		}
 
 
 		return decryptedFile

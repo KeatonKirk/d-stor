@@ -63,12 +63,8 @@ const Storage = (props) => {
     bucket_id.current = bucket
     user_obj.current = user_obj_json
     files.current = user_obj_json.files
-    // need to add logic here that makes file list accessible
   }
-  // if (user_obj.current) {
-    
-  //   console.log('FILES FROM STORAGE COMP:', files )
-  // }
+
 
   useEffect(() => {
     // make sure there is a connection to ceramic, if not, reconnect using address from stored authSig

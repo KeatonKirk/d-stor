@@ -28,24 +28,22 @@ const Login = (props) => {
 		console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
 		}
 
-
 		const enterApp = async () => {
-			data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});	
-			console.log('DATA ADDRESS:', data.address)
 			const accounts = await window.ethereum.request({
 				method: 'eth_requestAccounts',
 			})
+			data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});
 			await connect(new EthereumAuthProvider(window.ethereum, accounts[0]))
+			
 		}
 
 		if (!data && !ceramic_cookie_exists){
 			enterApp();
 		}
 	
-
 	const handleClick = async (e) => {
 	e.preventDefault();
-	
+
 	const sigToSend = JSON.stringify(data)
 
 	await sendSig(sigToSend)
@@ -66,7 +64,8 @@ const Login = (props) => {
 		<Fragment>
 			<div>
 				<h1>Almost There!</h1>
-				<p>dStor uses Self.ID to privately and securely store your information on a decentralized network. Please log in to retrieve your account.</p>
+				<p>dStor uses Self.ID to privately and securely store your information on a decentralized network.</p>
+				<p>After registering with Ceramic Network, please login to retrieve your account.</p>
 				<form onSubmit={ handleClick }>
 					<button disabled={!data || !ceramic_cookie_exists} type='submit'>Log In</button>
 				</form>

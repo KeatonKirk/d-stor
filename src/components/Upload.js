@@ -71,7 +71,6 @@ function Upload(props) {
 		window.sessionStorage.setItem('db_user', db_user_string)
 
 		const stringToEncrypt = window.sessionStorage.getItem('db_user')
-		console.log('ACCESS CONTROL CONDITIONS:', accessControlConditions)
 
 		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
 		
