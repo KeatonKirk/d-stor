@@ -58,13 +58,8 @@ function Upload(props) {
 			body: formData
 		});	
 		const responseJSON = await response.json();
-
-		
-		console.log("RESPONSE FROM Upload:", responseJSON)
 		const upload_name = responseJSON.replace('uploads/', '')
-		console.log('UPLOAD NAME:', upload_name)
 		user.files[file_name].push(upload_name)
-		console.log('USER FILES WITH UPLOAD NAME:', user.files)
 
 		const db_user_string = JSON.stringify(user)
 
@@ -74,19 +69,11 @@ function Upload(props) {
 
 		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
 		
-		// this should:
-		// take the updated user object with new file in files object,
-		// encrypt it, 
-		// upload the new encrypted user key to the db
-		// update the ceramic record dstor_id
-		
 		return userStringToStore
 	}
 
 	const handleChange = async (e) => {
-
 		setFile(e.target.files[0])
-		
 	}
 
 	const handleSubmit =  async () => {

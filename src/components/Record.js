@@ -5,13 +5,6 @@ export default function Record(props) {
 	const record = useViewerRecord('basicProfile')
 	const [connection, connect] = useViewerConnection();
 
-	const user_info = record.isLoading
-	? 'Loading'
-	: record.content.dstor_id 
-	? 'My Files:'
-	: 'Woops! Looks like there was an error connecting, please refresh and connect your wallet again :)'
-
-
 	useEffect(() => {
 		if (connection.status === 'idle') {
       const reconnect = async () => {
