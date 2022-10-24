@@ -71,7 +71,7 @@ app.post("/connect_wallet", async (req, res) => {
           body: JSON.stringify(body)
         })
         const json = await response.json()
-        user.bucket_id = await json.id3
+        user.bucket_id = await json.id
         console.log("SESSION USER IS:", user)
         // send user back to client
         res.send(user)
