@@ -7,11 +7,9 @@ const Login = (props) => {
 	const record =  useViewerRecord('basicProfile');
 	const [connection, connect, disconnect] = useViewerConnection();
 	const [responseBody, setResponseBody] = useState('')
-	//const [state, setState] = useState(false)
 
 	const ceramic_cookie_exists = document.cookie.includes('self.id')
 
-	//let db_response_body;
 	let data = JSON.parse(window.localStorage.getItem("lit-auth-signature"))
 
 	const sendSig = async (sig) => {
@@ -53,10 +51,6 @@ const Login = (props) => {
 				method: 'eth_requestAccounts',
 			})
 			await connect(new EthereumAuthProvider(window.ethereum, accounts[0]));
-
-			// if (!db_response_body.encrypted_key) {
-			// 	await callback();
-			// }
 		}
 	
 	const handleClick = async (e) => {
@@ -69,15 +63,7 @@ const Login = (props) => {
 	console.log('RECORD CONTENT after send sig:', record.content)
 	await ceramicSignIn();
 	console.log('RECORD CONTENT after ceramic sign:', record.content)
-	//setState(true)
 	} 
-
-	
-	// if (data && ceramic_cookie_exists && record.content && state ){
-	// 	console.log("NEW USER CONDITION MET")
-	// 	setState(false)
-	// 	newUser();
-	// }
 
 	useEffect(() => {
 		console.log('GOT TO USE EFFECT ON LOGIN')
