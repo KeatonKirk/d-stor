@@ -1,9 +1,12 @@
 import React, {useEffect} from 'react';
 import { useViewerRecord, useViewerConnection, EthereumAuthProvider } from '@self.id/framework';
 
+
+
 export default function Record(props) {
 	const record = useViewerRecord('basicProfile')
 	const [connection, connect] = useViewerConnection();
+
 
 	useEffect(() => {
 		if (connection.status === 'idle') {
