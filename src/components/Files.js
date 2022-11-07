@@ -1,4 +1,4 @@
-import {useState, useRef} from 'react'
+import {useRef} from 'react'
 import Download from './Download'
 // This component should fetch list of files from Chainsafe and display them on screen
 // will need to proxy the call through the server
