@@ -1,5 +1,5 @@
 import React from "react";
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect, useRef, useCallback} from 'react';
 import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework";
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import Record from './Record'
@@ -15,10 +15,11 @@ const Storage = (props) => {
   const user_obj = useRef();
   const files = useRef();
 
+  console.log('STORAGE COMPONENT RENDERED. USER:', user)
   const client = new LitJsSdk.LitNodeClient();
   client.connect();
   window.litNodeClient = client;
-  
+
   // Decrypting string using state var
   const decrypt = async (stringToDecrypt) => {
     console.log('ATTEMPTING DECRYPT IN STORAGE')
@@ -31,7 +32,7 @@ const Storage = (props) => {
     const authSig = await props.authSig
     // convert base64 string to blob
     const encryptedString = LitJsSdk.base64StringToBlob(stringToDecrypt)
-    const chain = 'ropsten'
+    const chain = 'goerli'
     const encryptedSymmetricKey = db_user.encrypted_key
     console.log('GOT ENCRYPTED SYMKEY:', encryptedSymmetricKey)
     const symmetricKey = await window.litNodeClient.getEncryptionKey({
@@ -42,12 +43,14 @@ const Storage = (props) => {
     });
     console.log("GOT SYMMKEY:", symmetricKey)
     try {
+      console.log('attempted final string decrypt', encryptedString, symmetricKey)
     const decryptedString = await LitJsSdk.decryptString(
       encryptedString,
       symmetricKey
     );
+    console.log('SUCCESSFULLY DECRYPTED USER STRING:', JSON.parse(decryptedString))
     setString(decryptedString)
-    return 
+     
     } catch (error) {
       console.log(error)
     }
@@ -59,7 +62,7 @@ const Storage = (props) => {
   if (string){
     const user_obj_json = JSON.parse(string)
     const bucket = user_obj_json.bucket_id
-    
+    console.log('Dstor user OBJECT IN STORAGE:', user_obj_json)
     bucket_id.current = bucket
     user_obj.current = user_obj_json
     files.current = user_obj_json.files
@@ -76,13 +79,13 @@ const Storage = (props) => {
       reconnect();
     }
     return
-  },[connect, connection.status, user])
+  },[connect, connection.status])
 
   if (bucket_id.current){
     return (
       <div>
         <div>
-          <Upload bucket_id={bucket_id.current} user_obj={user_obj.current}/>
+          <Upload bucket_id={bucket_id.current} user_obj={user_obj.current} setUser={setUser}/>
           <br></br>
           <Files bucket_id={bucket_id.current} files={files.current}/>
         </div>

@@ -1,5 +1,7 @@
-
-
+import styles from '../style'
+import Hero from '../style_components/Hero'
+import Business from '../style_components/Business'
+import Billing from '../style_components/Billing'
 const Home = () => {
 
 	
@@ -8,15 +10,29 @@ const Home = () => {
 	}
 
 	return (
-		<div>
-			<h1>Welcome to the Alpha release of dStor! </h1>
-			<p>NOTE: First time users will need to register with Ceramic network and mint an access NFT. Please be paitent during the process! :)</p>
-			<p>dStor is currently in development, please see github for full code and roadmap: https://github.com/KeatonKirk/d-stor</p>
-			<button
-				onClick={handleClick}>
-					Enter App
-			</button>
-		</div>
+    <div className="bg-primary w-full overflow-hidden">
+      <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+        <div className={`${styles.boxWidth}`}>
+          
+        </ div>
+      </div>
+
+      <div className={`bg-primary ${styles.flexStart}`}>
+        <div className={`${styles.boxWidth}`}>
+          <Hero />
+        </div>
+      </div>
+
+      <div className={`bg-primary ${styles.paddingX} ${styles.flexStart}`}>
+        <div className={`${styles.boxWidth}`}>
+
+          <Business />
+          <Billing />
+
+        </ div>
+      </div>
+
+    </div>
 
 	)
 }

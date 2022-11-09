@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import {encryptUser} from './EncryptUser'
 import { useViewerRecord } from "@self.id/framework"
@@ -9,9 +9,11 @@ import { useViewerRecord } from "@self.id/framework"
 // add file list to ceramic user files array
 
 function Upload(props) {
-	const [file, setFile] = useState()
+	const [file, setFile] = useState(null)
+	const inputRef = useRef(null)
 	const record = useViewerRecord('basicProfile')
 	
+
 	const encryptFile = async (file) => {
 		const client = await new LitJsSdk.LitNodeClient();
 		client.connect();
@@ -61,14 +63,9 @@ function Upload(props) {
 		const upload_name = responseJSON.replace('uploads/', '')
 		user.files[file_name].push(upload_name)
 
-		const db_user_string = JSON.stringify(user)
-
-		window.sessionStorage.setItem('db_user', db_user_string)
-
-		const stringToEncrypt = window.sessionStorage.getItem('db_user')
+		const stringToEncrypt = JSON.stringify(user)
 
 		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
-		
 		return userStringToStore
 	}
 
@@ -76,22 +73,30 @@ function Upload(props) {
 		setFile(e.target.files[0])
 	}
 
-	const handleSubmit =  async () => {
-
+	const handleSubmit = async (e) => {
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
+		//e.preventDefault();
 		const userStringToStore = await encryptFile(file)
-		console.log("USER STRING TO STORE AFTER ENCRYPT", userStringToStore)
 		await record.merge({dstor_id: userStringToStore})
-		console.log('RECORD AFTER ENCRYPT', record)
-		window.location.reload()
+		inputRef.current.value = null;
+		
+		
 	}
+
+	useEffect(() => {
+		if (!record.isLoading && record.content && !record.isMutating && record.content.dstor_id) {
+			console.log("DSTOR ID FROM Upload:", record.content)
+			props.setUser(record.content.dstor_id)
+		}
+	
+		return 
+	},[record.isLoading, props, record.content, record])
 	
 	return (
 		<div>
 			<h2>Upload New File</h2>
-
-          <input id='input' type="file" onChange={handleChange}/>
+          <input ref={inputRef} type="file" onChange={handleChange}/>
           <button disabled={!file} onClick={handleSubmit}>Upload</button>
 		</div>
 	)

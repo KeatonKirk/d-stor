@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Provider } from '@self.id/framework';
 import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './components/Home'
+import styles from './style'
+import Navbar  from './style_components/Navbar'
 
 const LazyLogin = React.lazy(() => import ("./components/Login"))
 const LazyStorage = React.lazy(() => import ("./components/Storage"))
@@ -33,6 +35,14 @@ function App( {children}) {
 
 
   return (
+    <>
+    <div className="bg-primary w-full overflow-hidden">
+      <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+        <div className={`${styles.boxWidth}`}>
+          <Navbar />
+        </ div>
+      </div>
+    </div>
     <Provider client={{ ceramic: 'testnet-clay' }}>
       <Router>
         <React.Suspense fallback='Loading...'>
@@ -44,6 +54,7 @@ function App( {children}) {
         </React.Suspense>
       </Router>
     </Provider>
+    </>
   )
 }
 

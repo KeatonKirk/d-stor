@@ -1,7 +1,6 @@
 import {useRef} from 'react'
 import Download from './Download'
-// This component should fetch list of files from Chainsafe and display them on screen
-// will need to proxy the call through the server
+
 const Files = (props) => {
 	const bucket_id_obj = {bucket_id: props.bucket_id}
 

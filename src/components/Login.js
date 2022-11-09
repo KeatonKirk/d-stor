@@ -67,7 +67,7 @@ const Login = (props) => {
 
 	useEffect(() => {
 		console.log('GOT TO USE EFFECT ON LOGIN')
-		if (data && ceramic_cookie_exists && record.content && !record.isMutating ){
+		if (data && ceramic_cookie_exists && record.content && !record.isMutating && responseBody ){
 			console.log("NEW USER CONDITION MET")
 			newUser();
 		}

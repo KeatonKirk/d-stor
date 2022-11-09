@@ -24,7 +24,7 @@ export default function Record(props) {
 		return
 	},[record.isLoading, props, record.content, record, connect, connection.status])
 	
-	
+	// TO DO replace div below with progress spinner
 	return (
 		<div>loading, please wait</div>
 	)
