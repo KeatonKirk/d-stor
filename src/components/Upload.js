@@ -93,11 +93,19 @@ function Upload(props) {
 	},[record.isLoading, props, record.content, record])
 	
 	return (
-		<div className="mt-30">
-			<h2>Upload New File</h2>
-          <input ref={inputRef} type="file" onChange={handleChange}/>
-          <button className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" disabled={!file} onClick={handleSubmit}>Upload</button>
-		</div>
+	<div className="mt-10">
+		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] w-full">Upload New File</h2>
+		<input ref={inputRef} type="file" className=" text-sm text-slate-500
+			file:mr-4 file:py-2 file:px-4
+			file:rounded-full file:border-0
+			file:text-sm file:font-semibold
+			file:bg-sky-50 file:text-sky-500
+			hover:file:bg-violet-100
+		"
+		onChange={handleChange}/>
+		<button disabled={!file} onClick={handleSubmit} className="w-[100px] rounded-full bg-sky-500">Upload</button>
+	</div>
+
 	)
 }
 

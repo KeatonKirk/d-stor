@@ -1,5 +1,5 @@
 import React from "react";
-import {useState, useEffect, useRef, useCallback} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import { useViewerConnection, EthereumAuthProvider } from "@self.id/framework";
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import Record from './Record'
