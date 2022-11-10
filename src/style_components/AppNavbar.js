@@ -20,7 +20,6 @@ function AppNavbar(props) {
 		}
 	];
 
-	
 
 	return (
 		<nav className="w-full flex py-3 justify-between items-center navbar">
