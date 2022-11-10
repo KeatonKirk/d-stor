@@ -6,8 +6,8 @@ import { close, logo_white, menu } from '../assets'
 function AppNavbar(props) {
 	const [ toggle, setToggle] = useState(false)
 	
-	const navButton = (window.location === '/' ? 'Enter App' : 'Connect Wallet')
-	const navText = (window.location === '/' ? 'Enter App' : 'Connect Wallet')
+	const navButton = (window.location.pathname === '/login' ? props.handleClick : props.handleDisconnect)
+	const navText = (window.location.pathname === '/login' ? 'Connect Wallet' : 'Disconnect')
 
 	const navLinks = [
 		{
@@ -30,7 +30,7 @@ function AppNavbar(props) {
 
 			<div className="hidden sm:ml-6 sm:block">
           <div className="flex space-x-4">
-            <button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" onClick={props.handleClick} aria-current="page">Connect Wallet</button>
+            <button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" onClick={navButton} aria-current="page">{navText}</button>
           </div>
         </div>
 

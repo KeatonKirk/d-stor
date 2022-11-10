@@ -11,7 +11,7 @@ import AppNavbar from '../style_components/AppNavbar'
 
 
 const Storage = (props) => {
-  const [connection, connect] = useViewerConnection();
+  const [connection, connect, disconnect] = useViewerConnection();
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
   const bucket_id = useRef();
@@ -59,6 +59,12 @@ const Storage = (props) => {
     }
   }
 
+  const handleDisconnect = async () => {
+    disconnect();
+    window.localStorage.removeItem("lit-auth-signature")
+    window.location.assign('/login')
+  }
+
   if (user) {
     decrypt(user);
   } 
@@ -91,7 +97,7 @@ const Storage = (props) => {
         <div className="bg-primary w-full overflow-hidden">
           <div className={`${styles.paddingX} ${styles.flexCenter}`}>
             <div className={`${styles.boxWidth}`}>
-              <AppNavbar />
+              <AppNavbar handleDisconnect={handleDisconnect} />
             </div>
           </div>
         </div>
