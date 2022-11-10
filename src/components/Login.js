@@ -1,7 +1,8 @@
 import React, {Fragment, useState, useEffect} from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
 import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
-
+import styles from '../style'
+import AppNavbar from '../style_components/AppNavbar'
 
 const Login = (props) => {
 	const record =  useViewerRecord('basicProfile');
@@ -77,6 +78,13 @@ const Login = (props) => {
 	return (
 		<Fragment>
 			<div>
+			<div className="bg-primary w-full overflow-hidden">
+          <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <AppNavbar handleClick={handleClick} />
+            </ div>
+        </div>
+    </div>
 				<h1>Almost There!</h1>
 				<p>dStor uses Self.ID to privately and securely store your information on a decentralized network.</p>
 				<p>After registering with Ceramic Network, please login to retrieve your account.</p>

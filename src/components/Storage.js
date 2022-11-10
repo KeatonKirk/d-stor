@@ -5,6 +5,9 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import Record from './Record'
 import Files from './Files'
 import Upload from './Upload'
+import styles from '../style'
+import AppNavbar from '../style_components/AppNavbar'
+//import Sidebar from './Sidebar'
 
 
 const Storage = (props) => {
@@ -84,12 +87,26 @@ const Storage = (props) => {
   if (bucket_id.current){
     return (
       <div>
-        <div>
-          <Upload bucket_id={bucket_id.current} user_obj={user_obj.current} setUser={setUser}/>
-          <br></br>
-          <Files bucket_id={bucket_id.current} files={files.current}/>
+
+        <div className="bg-primary w-full overflow-hidden">
+          <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+            <div className={`${styles.boxWidth}`}>
+              <AppNavbar />
+            </div>
+          </div>
         </div>
-      </div>
+
+        <div className={`${styles.flexStart}`}>
+          <div className={`flex-1 ${styles.flexStart} flex-col xl:px-0 sm:px-16 px-6`}>
+          <div className="flex flex-col justify-between items-left w-full text-inherit">
+            <Upload bucket_id={bucket_id.current} user_obj={user_obj.current} setUser={setUser}/>
+            <br></br>
+            <Files bucket_id={bucket_id.current} files={files.current}/>
+          </div>
+          </div>
+          </div>
+    </div>
+
     )
   }
   return (

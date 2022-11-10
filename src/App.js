@@ -36,13 +36,7 @@ function App( {children}) {
 
   return (
     <>
-    <div className="bg-primary w-full overflow-hidden">
-      <div className={`${styles.paddingX} ${styles.flexCenter}`}>
-        <div className={`${styles.boxWidth}`}>
-          <Navbar />
-        </ div>
-      </div>
-    </div>
+
     <Provider client={{ ceramic: 'testnet-clay' }}>
       <Router>
         <React.Suspense fallback='Loading...'>

@@ -23,12 +23,27 @@ const Files = (props) => {
 
 			return (
 			<div>
-				<h2>My Files:</h2>
-					{files.current.map(file => (
-						<>
-						<p key={file}>{file}</p><Download bucket_id={bucket_id_obj} file_name={file} files={prop_files} />
-						</>
-					))}
+				<table className="table-auto ">
+					<thead>
+						<tr>
+							<th className="border border-separate ">File</th>
+							<th className="border border-separate ">Download</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						{files.current.map(file => (
+
+							<tr>
+								<td className="border border-separate " key={file}>{file}</td>
+								<td className="border border-separate "><Download bucket_id={bucket_id_obj} file_name={file} files={prop_files} /></td>
+							</tr>
+
+						))}
+						
+					</tbody>
+
+					</table>
 			</div>
 		);
 	} else {

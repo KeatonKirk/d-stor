@@ -3,7 +3,7 @@ import { close, logo_white, menu } from '../assets'
 
 
 
-function Navbar() {
+function AppNavbar(props) {
 	const [ toggle, setToggle] = useState(false)
 	
 	const navButton = (window.location === '/' ? 'Enter App' : 'Connect Wallet')
@@ -31,7 +31,7 @@ function Navbar() {
 
 			<div className="hidden sm:ml-6 sm:block">
           <div className="flex space-x-4">
-            <a href='login' className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" aria-current="page">Enter App</a>
+            <button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" onClick={props.handleClick} aria-current="page">Connect Wallet</button>
           </div>
         </div>
 
@@ -62,4 +62,4 @@ function Navbar() {
 	)
 }
 
-export default Navbar
+export default AppNavbar

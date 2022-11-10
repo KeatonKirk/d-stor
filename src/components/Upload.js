@@ -76,7 +76,6 @@ function Upload(props) {
 	const handleSubmit = async (e) => {
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
-		//e.preventDefault();
 		const userStringToStore = await encryptFile(file)
 		await record.merge({dstor_id: userStringToStore})
 		inputRef.current.value = null;
@@ -97,7 +96,7 @@ function Upload(props) {
 		<div>
 			<h2>Upload New File</h2>
           <input ref={inputRef} type="file" onChange={handleChange}/>
-          <button disabled={!file} onClick={handleSubmit}>Upload</button>
+          <button className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" disabled={!file} onClick={handleSubmit}>Upload</button>
 		</div>
 	)
 }
