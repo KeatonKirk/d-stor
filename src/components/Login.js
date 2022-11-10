@@ -4,6 +4,7 @@ import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self
 import styles from '../style'
 import AppNavbar from '../style_components/AppNavbar'
 
+
 const Login = (props) => {
 	const record =  useViewerRecord('basicProfile');
 	const [connection, connect, disconnect] = useViewerConnection();
@@ -77,7 +78,7 @@ const Login = (props) => {
 
 	return (
 		<Fragment>
-			<div>
+		<div>
 			<div className="bg-primary w-full overflow-hidden">
           <div className={`${styles.paddingX} ${styles.flexCenter}`}>
             <div className={`${styles.boxWidth}`}>
@@ -85,13 +86,15 @@ const Login = (props) => {
             </ div>
         </div>
     </div>
-				<h1>Almost There!</h1>
-				<p>dStor uses Self.ID to privately and securely store your information on a decentralized network.</p>
-				<p>After registering with Ceramic Network, please login to retrieve your account.</p>
-				<form onSubmit={ handleClick }>
-					<button disabled={record.isLoading || record.isMutating} type='submit'>Log In</button>
-				</form>
-			</div>
+		<div className="mt-30">
+			<h2>Upload New File</h2>
+          <input disabled={true} type="file" />
+          <button className="rounded-full bg-gray-800 p-1 text-gray-400  focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" disabled={true}>Upload</button>
+		</div>
+		<br/>
+		<h2 className='font-poppins font-semibold text-[30px]'>My files:</h2>
+		<p className="font-poppins font-semibold">Please Connect Wallet to access your account</p>
+	</div>
 		</Fragment>
 	)
 }

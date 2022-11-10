@@ -96,13 +96,11 @@ const Storage = (props) => {
           </div>
         </div>
 
-        <div className={`${styles.flexStart}`}>
-          <div className={`flex-1 ${styles.flexStart} flex-col xl:px-0 sm:px-16 px-6`}>
-          <div className="flex flex-col justify-between items-left w-full text-inherit">
+          <div className={`flex-1 ${styles.flexStart} flex-col sm:px-16`}>
+          <div className="flex flex-col justify-between items-left w-full">
             <Upload bucket_id={bucket_id.current} user_obj={user_obj.current} setUser={setUser}/>
             <br></br>
             <Files bucket_id={bucket_id.current} files={files.current}/>
-          </div>
           </div>
           </div>
     </div>

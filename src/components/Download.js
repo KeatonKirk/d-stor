@@ -1,5 +1,6 @@
 import React from 'react'
 import {decryptFile} from './DecryptFile'
+import { HiOutlineDownload } from 'react-icons/hi';
 
 function Download(props) {
 
@@ -50,9 +51,9 @@ const handleClick = async () => {
 	}
 }
 	return (
-		<>
-		<button onClick={handleClick}>Download</button>
-		</>
+		<span className="ml-[20px] w-[100px]">
+		<button className="" onClick={handleClick}><HiOutlineDownload size={30}/></button>
+		</span>
 	)
 }
 

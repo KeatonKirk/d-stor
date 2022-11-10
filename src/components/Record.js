@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
 import { useViewerRecord, useViewerConnection, EthereumAuthProvider } from '@self.id/framework';
-
-
+import styles from '../style'
+import Spinner from '../style_components/Spinner'
+import { close, logo_white, menu } from '../assets'
 
 export default function Record(props) {
 	const record = useViewerRecord('basicProfile')
@@ -26,6 +27,28 @@ export default function Record(props) {
 	
 	// TO DO replace div below with progress spinner
 	return (
-		<div>loading, please wait</div>
+
+		<>
+		<div className="bg-primary w-full overflow-hidden">
+		<div className={`${styles.paddingX} ${styles.flexCenter}`}>
+			<div className={`${styles.boxWidth}`}>
+
+			<nav className="w-full flex py-3 justify-between items-center navbar">
+				<a href="/">
+					<img src={logo_white} alt="dstor" className=" ml-0 w-[85px] h-[75px]"/>
+				</a>
+				<div className="hidden sm:ml-6 sm:block">
+						<div className="flex space-x-4">
+							<button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" disabled={true} aria-current="page">Connecting..</button>
+						</div>
+					</div>
+			</nav>
+			
+			</div>
+		</div>
+	</div>
+	<Spinner />
+	</>
+
 	)
 }
