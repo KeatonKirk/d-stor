@@ -1,14 +1,18 @@
-import React from 'react'
+import React, {useState, useEffect}  from 'react'
 import {decryptFile} from './DecryptFile'
 import { HiOutlineDownload } from 'react-icons/hi';
+import {Blocks} from 'react-loader-spinner';
 
 function Download(props) {
+const [downloading, setDownloading] = useState(false)
+const [file, setFile] = useState(true)
 
 const file_list = props.files
 const file_path = file_list[props.file_name][1]
 const bucket_id = props.bucket_id.bucket_id
 
 const handleClick = async () => {
+	setDownloading(true)
 	console.log('click handler')
 	console.log('PROPS IN DOWNLOAD FROM FILES COMP',file_list, file_path, bucket_id.bucket_id )
 	const body = {
@@ -49,6 +53,26 @@ const handleClick = async () => {
 	} catch(error) {
 		console.log(error)
 	}
+	setFile((prev) => !prev )
+}
+
+useEffect(() => {
+	if (downloading && !file) {
+		setDownloading(false)
+		setFile((prev) => !prev )
+	}
+
+}, [downloading, file])
+
+
+if (downloading) {
+	return (
+		<Blocks					
+		color="#00BFFF"
+		height={30}
+		width={80}
+		className="" />
+	)
 }
 	return (
 		<span className="ml-[20px] w-[100px]">

@@ -1,6 +1,5 @@
 import {useRef} from 'react'
 import Download from './Download'
-import styles, {layout} from '../style'
 const Files = (props) => {
 	const bucket_id_obj = {bucket_id: props.bucket_id}
 	const files =  useRef([])
