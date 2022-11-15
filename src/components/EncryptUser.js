@@ -2,6 +2,7 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 
 
 export async function encryptUser (stringToEncrypt, accessControlConditions, db_user)  {
+	console.log('INSIDE ENCRYPT USER')
 		const client = await new LitJsSdk.LitNodeClient();
 		client.connect();
 		window.litNodeClient = client;

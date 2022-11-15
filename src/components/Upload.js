@@ -58,7 +58,8 @@ function Upload(props) {
 		formData.append('file_name', file.name)
 
 		const api_url = '/upload'
-		const response =  await axios({
+		try {
+			const response =  await axios({
 			method: 'post',
 			url: api_url,
 			data: formData,
@@ -68,18 +69,19 @@ function Upload(props) {
 			onUploadProgress: (event) => {
 				console.log('BROWSER PROGRESS TEST:', event)
 			}
-			
-		}, { timeout: -1});	
+		}, { timeout: -1});
 
 		console.log('REPSONSE FROM UPLOAD:', response)
 		const responseString = response.data
 		const upload_name = responseString.replace('uploads/', '')
 		user.files[file_name].push(upload_name)
-
 		const stringToEncrypt = JSON.stringify(user)
-
 		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
 		return userStringToStore
+		} catch (error) {
+			console.log(error)
+		}
+		
 	}
 
 	const handleChange = async (e) => {
@@ -89,9 +91,16 @@ function Upload(props) {
 	const handleSubmit = async (e) => {
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
+		console.log('file after selection:', file)
 		console.log('upload handle submit reached')
+		if(file.size > 20000000){
+			inputRef.current.value = null
+			window.alert('Oops! File is too large. Please limit uploads to 20mb for now.')
+			return
+		}
 		setUploading(true)
 		const userStringToStore = await encryptFile(file)
+		console.log('got passed file upload')
 		await record.merge({dstor_id: userStringToStore})
 		setFile(null)
 	}
@@ -105,7 +114,7 @@ function Upload(props) {
 		if (uploading && !file) {
 			setUploading(false)
 			inputRef.current.value = null
-			window.alert('Upload Successful')
+			window.alert('Upload Successful!')
 		}
 	
 		return 
@@ -115,7 +124,6 @@ function Upload(props) {
 		return(
 		<>
 		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] mt-10">Upload New File</h2>
-
 		<div className="flex items-center">
 			<input ref={inputRef} disabled={true} type="file" className=" text-sm text-slate-500
 				file:mr-4 file:py-2 file:px-4
@@ -132,8 +140,6 @@ function Upload(props) {
 					className="align-bottom"
 				/>   
 			</div>
-
-			
 		</div>
 	</>
 
