@@ -5,13 +5,17 @@ const path = require('path');
 const multer = require('multer')
 const upload = multer({dest: "uploads/"})
 const FormData = require('form-data')
-
 const fs = require('fs');
 const client = require("./prod_db")
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
-
-
+const axios = require('axios')
+const zlib = require('zlib')
+const gzip = zlib.createGzip();
+gzip.on('data', () => {
+	console.log(gzip.bytesWritten)
+})
+const unzip = zlib.createUnzip()
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -135,20 +139,49 @@ app.post('/get_files', async (req, res) => {
     try {
     console.log('GOT TO FILE UPLOAD')
     const file = req.file
+    console.log('request:', file)
     const uploadFile = fs.createReadStream(file.path)
+
+    //compression flow
+    // const compPath = (file.path + '.gz')
+    // const uploadPath = (compPath + '(1)')
+    // console.log('compression path:', compPath)
+    // const output = fs.createWriteStream(compPath)
+    // uploadFile.pipe(gzip).pipe(output)
+    // const fileToUpload = fs.createReadStream(uploadPath)
+
     const {bucket_id}  = req.body
     const form = new FormData()
-    form.append('file', uploadFile)
-    const headers = form.getHeaders()
-    
-     await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, {
-      method: 'post',
+    form.append('file', uploadFile, file.name)
+    form.append('path', '/')
+    const formHeaders = form.getHeaders()
+
+    // const initialPath = file.path.replace('uploads/', '')
+    // const filePath = ('/' + initialPath)
+    // const checkUploadBody = {
+    //   is_update: true,
+    //   files_meta: [{
+    //     "path": filePath
+    //   }]
+    // }
+    // console.log('FILE PATH:', filePath)
+
+    await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
       headers: {
         "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
-        headers
+        formHeaders
       },
-      body: form
-    })
+    });
+
+    // const uploadStatus = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/check-upload`, {
+    //   method: 'post',
+    //   headers: {
+    //     "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
+    //     "Content-Type": 'application/json'
+    //   },
+    //   body: JSON.stringify(checkUploadBody)
+    // })
+    // console.log('UPLOAD STATUS', await uploadStatus.json() )
     const json = JSON.stringify(file.path);
 
     await res.send(json)
@@ -157,15 +190,27 @@ app.post('/get_files', async (req, res) => {
           throw err;
       }
       console.log("Delete Upload successfully.");
-  });
+    });
+
     } catch (err) {
       console.log(err)
     }
+    res.end()
   }
 
   app.post('/upload', upload.single('file'), uploadFile);
 
   app.post('/download', async (req, res) => {
+
+    // decompression flow 
+    // const decompress = (file_name) => {
+    //   const compressedFile = ('downloads/' + file_name)
+    //   const decompressedFile = ('downloads/' + file_name + '(1)')
+    //   const inp = fs.createReadStream(compressedFile);
+    //   const out = fs.createWriteStream(decompressedFile)
+    //   inp.pipe(unzip).pipe(out)
+    // }
+
     try{
       const {bucket_id, file_path, file_name} = req.body
       const file_path_string = '/' + file_path;
@@ -182,14 +227,17 @@ app.post('/get_files', async (req, res) => {
     })
 
     const fileStream = await fs.createWriteStream('downloads/' + file_name);
-     await new Promise((resolve, reject) => {
-      response.body.pipe(fileStream);
-      response.body.on("error", reject);
-        fileStream.on("finish", () => {
-            fileStream.close()
-            resolve()
-        });
+    await new Promise((resolve, reject) => {
+    response.body.pipe(fileStream);
+    response.body.on("error", reject);
+    fileStream.on("finish", () => {
+        fileStream.close()
+        resolve()
     });
+    });
+
+    //decompress(file_name)
+
     await res.download('downloads/' + file_name)
     
     } catch (err) {
@@ -202,7 +250,7 @@ app.post('/get_files', async (req, res) => {
     try {
       const {file_name} = req.body
       console.log(file_name)
-      fs.unlink('downloads/' + file_name, (err) => {
+      fs.unlink(('downloads/' + file_name), (err) => {
         if (err) {
             throw err;
         }
@@ -211,6 +259,7 @@ app.post('/get_files', async (req, res) => {
     } catch (error) {
       console.log(error)
     }
+    res.end()
   })
 
 // All other GET requests not handled before will return our React app

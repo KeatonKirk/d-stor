@@ -14,6 +14,7 @@ const Storage = (props) => {
   const [connection, connect, disconnect] = useViewerConnection();
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
+  //const [uploading, setUploading] = useState(false)
   const bucket_id = useRef();
   const user_obj = useRef();
   const files = useRef();

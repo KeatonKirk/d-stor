@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react';
 import LitJsSdk from "@lit-protocol/sdk-browser";
-import {encryptUser} from './EncryptUser'
-import { useViewerRecord } from "@self.id/framework"
+import {encryptUser} from './EncryptUser';
+import { useViewerRecord } from "@self.id/framework";
+import axios from 'axios';
+import {ProgressBar} from 'react-loader-spinner';
 
 // take file input from user
 // encrypt file with lit
@@ -10,6 +12,7 @@ import { useViewerRecord } from "@self.id/framework"
 
 function Upload(props) {
 	const [file, setFile] = useState(null)
+	const [uploading, setUploading] = useState(false)
 	const inputRef = useRef(null)
 	const record = useViewerRecord('basicProfile')
 	
@@ -55,12 +58,22 @@ function Upload(props) {
 		formData.append('file_name', file.name)
 
 		const api_url = '/upload'
-		const response =  await fetch(api_url, {
-			method: 'POST',
-			body: formData
-		});	
-		const responseJSON = await response.json();
-		const upload_name = responseJSON.replace('uploads/', '')
+		const response =  await axios({
+			method: 'post',
+			url: api_url,
+			data: formData,
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			},
+			onUploadProgress: (event) => {
+				console.log('BROWSER PROGRESS TEST:', event)
+			}
+			
+		}, { timeout: -1});	
+
+		console.log('REPSONSE FROM UPLOAD:', response)
+		const responseString = response.data
+		const upload_name = responseString.replace('uploads/', '')
 		user.files[file_name].push(upload_name)
 
 		const stringToEncrypt = JSON.stringify(user)
@@ -76,11 +89,11 @@ function Upload(props) {
 	const handleSubmit = async (e) => {
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
+		console.log('upload handle submit reached')
+		setUploading(true)
 		const userStringToStore = await encryptFile(file)
 		await record.merge({dstor_id: userStringToStore})
-		inputRef.current.value = null;
-		
-		
+		setFile(null)
 	}
 
 	useEffect(() => {
@@ -88,10 +101,44 @@ function Upload(props) {
 			console.log("DSTOR ID FROM Upload:", record.content)
 			props.setUser(record.content.dstor_id)
 		}
+
+		if (uploading && !file) {
+			setUploading(false)
+			inputRef.current.value = null
+			window.alert('Upload Successful')
+		}
 	
 		return 
-	},[record.isLoading, props, record.content, record])
+	},[record.isLoading, props, record.content, record, uploading, file])
 	
+	if (uploading) {
+		return(
+		<>
+		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] mt-10">Upload New File</h2>
+
+		<div className="flex items-center">
+			<input ref={inputRef} disabled={true} type="file" className=" text-sm text-slate-500
+				file:mr-4 file:py-2 file:px-4
+				file:rounded-full file:border-0
+				file:text-sm file:font-semibold
+				file:bg-sky-50 file:text-sky-500
+			"/>
+			<p className="align-text-bottom">Uploading...</p>
+			<div className="">
+				<ProgressBar
+					color="#00BFFF"
+					height={50}
+					width={100}
+					className="align-bottom"
+				/>   
+			</div>
+
+			
+		</div>
+	</>
+
+		)
+	}
 	return (
 	<div className="mt-10">
 		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] w-full">Upload New File</h2>
