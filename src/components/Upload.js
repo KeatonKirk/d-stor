@@ -3,7 +3,8 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import {encryptUser} from './EncryptUser';
 import { useViewerRecord } from "@self.id/framework";
 import axios from 'axios';
-import {ProgressBar} from 'react-loader-spinner';
+//import {ProgressBar} from 'react-loader-spinner';
+import ProgressBar from '../style_components/ProgressBar'
 
 // take file input from user
 // encrypt file with lit
@@ -13,6 +14,7 @@ import {ProgressBar} from 'react-loader-spinner';
 function Upload(props) {
 	const [file, setFile] = useState(null)
 	const [uploading, setUploading] = useState(false)
+	const [loading, setLoading] = useState(30)
 	const inputRef = useRef(null)
 	const record = useViewerRecord('basicProfile')
 	
@@ -68,6 +70,9 @@ function Upload(props) {
 			},
 			onUploadProgress: (event) => {
 				console.log('BROWSER PROGRESS TEST:', event)
+				const percentageRaw = (event.progress * 100)
+				const percentage = percentageRaw.toFixed(2)
+				setLoading(percentage)
 			}
 		}, { timeout: -1});
 
@@ -92,11 +97,11 @@ function Upload(props) {
 		//send to server to upload via chainsafe
 		console.log('file after selection:', file)
 		console.log('upload handle submit reached')
-		if(file.size > 20000000){
-			inputRef.current.value = null
-			window.alert('Oops! File is too large. Please limit uploads to 20mb for now.')
-			return
-		}
+		// if(file.size > 20000000){
+		// 	inputRef.current.value = null
+		// 	window.alert('Oops! File is too large. Please limit uploads to 20mb for now.')
+		// 	return
+		// }
 		setUploading(true)
 		const userStringToStore = await encryptFile(file)
 		console.log('got passed file upload')
@@ -131,13 +136,12 @@ function Upload(props) {
 				file:bg-sky-50 file:text-sky-500
 			"/>
 			<p className="align-text-bottom">Uploading...</p>
-			<div className="">
-				<ProgressBar
-					color="#00BFFF"
-					height={50}
-					width={100}
-					className="align-bottom"
-				/>   
+			<div className="text-black">
+				<div className="pt-4">
+					<div className="overflow-hidden h-2 mb-4 text-xs text-center flex rounded bg-sky-200 h-[16px] w-[200px]">
+						<div style={{width: (loading * 2)}} className="shadow-none text-center whitespace-nowrap text-white justify-between bg-sky-500 h-[100px]"><p className="text-slate-800">{loading}% Completed</p></div>
+					</div>
+				</div>  
 			</div>
 		</div>
 	</>

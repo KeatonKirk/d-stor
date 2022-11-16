@@ -6,6 +6,7 @@
     "@headlessui/react": "^1.7.3",
     "@heroicons/react": "^2.0.13",
     "@lit-protocol/sdk-browser": "^1.1.226",
+    "@material-tailwind/react": "^1.2.4",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@openzeppelin/contracts": "^4.7.3",
     "@self.id/framework": "^0.3.3",

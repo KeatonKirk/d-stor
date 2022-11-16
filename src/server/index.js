@@ -4,7 +4,7 @@ const fetch = (...args) =>
 const path = require('path');
 const multer = require('multer');
 
-const upload = multer({dest: "uploads/", limits: { fileSize: 20000000 }})
+const upload = multer({dest: "uploads/"})
 
 const FormData = require('form-data')
 const fs = require('fs');
