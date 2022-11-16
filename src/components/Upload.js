@@ -3,7 +3,6 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import {encryptUser} from './EncryptUser';
 import { useViewerRecord } from "@self.id/framework";
 import axios from 'axios';
-//import {ProgressBar} from 'react-loader-spinner';
 
 // take file input from user
 // encrypt file with lit
@@ -13,7 +12,7 @@ import axios from 'axios';
 function Upload(props) {
 	const [file, setFile] = useState(null)
 	const [uploading, setUploading] = useState(false)
-	const [loading, setLoading] = useState(30)
+	const [loading, setLoading] = useState(0)
 	const inputRef = useRef(null)
 	const record = useViewerRecord('basicProfile')
 	
@@ -106,11 +105,12 @@ function Upload(props) {
 		console.log('got passed file upload')
 		await record.merge({dstor_id: userStringToStore})
 		setFile(null)
+		setLoading(0)
 	}
 
 	useEffect(() => {
-		if (!record.isLoading && record.content && !record.isMutating && record.content.dstor_id) {
-			console.log("DSTOR ID FROM Upload:", record.content)
+		if (!record.isLoading && record.content && !record.isMutating && record.content.dstor_id && !uploading) {
+			console.log("In upload useeffect")
 			props.setUser(record.content.dstor_id)
 		}
 
