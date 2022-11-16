@@ -67,7 +67,7 @@ function Upload(props) {
 				'Content-Type': 'multipart/form-data'
 			},
 			onUploadProgress: (event) => {
-				console.log('BROWSER PROGRESS TEST:', event)
+				//console.log('BROWSER PROGRESS TEST:', event)
 				const percentageRaw = (event.progress * 100)
 				const percentage = percentageRaw.toFixed(2)
 				setLoading(percentage)
@@ -93,16 +93,13 @@ function Upload(props) {
 		//enforce file size limit
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
-		console.log('file after selection:', file)
-		console.log('upload handle submit reached')
-		// if(file.size > 20000000){
-		// 	inputRef.current.value = null
-		// 	window.alert('Oops! File is too large. Please limit uploads to 20mb for now.')
-		// 	return
-		// }
+		if(file.size > 50000000){
+			inputRef.current.value = null
+			window.alert('Oops! File is too large. Please limit uploads to 50mb for now.')
+			return
+		}
 		setUploading(true)
 		const userStringToStore = await encryptFile(file)
-		console.log('got passed file upload')
 		await record.merge({dstor_id: userStringToStore})
 		setFile(null)
 		setLoading(0)
