@@ -4,7 +4,6 @@ import {encryptUser} from './EncryptUser';
 import { useViewerRecord } from "@self.id/framework";
 import axios from 'axios';
 //import {ProgressBar} from 'react-loader-spinner';
-import ProgressBar from '../style_components/ProgressBar'
 
 // take file input from user
 // encrypt file with lit
