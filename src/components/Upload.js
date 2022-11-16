@@ -80,15 +80,14 @@ function Upload(props) {
 		return userStringToStore
 		} catch (error) {
 			console.log(error)
-		}
-		
-	}
+		}}
 
 	const handleChange = async (e) => {
 		setFile(e.target.files[0])
 	}
 
 	const handleSubmit = async (e) => {
+		//enforce file size limit
 		//encrypt file + update user object
 		//send to server to upload via chainsafe
 		console.log('file after selection:', file)

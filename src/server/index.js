@@ -3,7 +3,9 @@ const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const path = require('path');
 const multer = require('multer');
+
 const upload = multer({dest: "uploads/", limits: { fileSize: 20000000 }})
+
 const FormData = require('form-data')
 const fs = require('fs');
 const client = require("./prod_db")
@@ -22,7 +24,7 @@ app.use((error, req, res, next) => {
   if ( error instanceof multer.MulterError) {
     if (error.code === "LIMIT_FILE_SIZE") {
       return res.json({
-        message: 'File too large: Please limit to 20MB'
+        message: 'File too large: Please limit uploads to 20mb'
       })
     }
   }
@@ -141,7 +143,6 @@ app.post('/get_files', async (req, res) => {
     const file = req.file
     console.log('request:', file)
     const uploadFile = fs.createReadStream(file.path)
-
     const {bucket_id}  = req.body
     const form = new FormData()
     form.append('file', uploadFile, file.name)
@@ -164,6 +165,7 @@ app.post('/get_files', async (req, res) => {
       }
       console.log("Delete Upload successfully.");
     });
+
     } catch (err) {
       console.log(err)
     }
@@ -173,6 +175,7 @@ app.post('/get_files', async (req, res) => {
   app.post('/upload', upload.single('file'), uploadFile);
 
   app.post('/download', async (req, res) => {
+
     try{
       const {bucket_id, file_path, file_name} = req.body
       const file_path_string = '/' + file_path;
@@ -197,7 +200,9 @@ app.post('/get_files', async (req, res) => {
         resolve()
     });
     });
+
     await res.download('downloads/' + file_name)
+    
     } catch (err) {
       console.log(err)
     }
