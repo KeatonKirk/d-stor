@@ -12,6 +12,10 @@ module.exports = {
     goerli: {
       url: process.env.GOERLI_API_URL,
       accounts: [process.env.GOERLI_PRIVATE_KEY]
+    },
+    polygon: {
+      url: process.env.POLYGON_API_URL,
+      accounts: [process.env.GOERLI_PRIVATE_KEY]
     }
   }
 };

@@ -33,7 +33,7 @@ const Login = (props) => {
 		}
 
 		const litSignIn = async () => {
-			data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});
+			data = await LitJsSdk.checkAndSignAuthMessage({chain: "polygon",});
 		}
 
 		const newUser = async () => {

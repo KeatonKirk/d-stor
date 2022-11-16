@@ -27,7 +27,7 @@ function Upload(props) {
 		console.log('FILE NAME FROM UPLOAD:', file.name)
 		const user = props.user_obj
 		const accessControlConditions = user.nft_info
-    const chain = 'goerli'  
+    const chain = 'polygon'  
 
 		const file_name = file.name
 		console.log('FILES FROM DBUSER:', user, user.files)

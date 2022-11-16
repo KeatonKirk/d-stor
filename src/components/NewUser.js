@@ -4,7 +4,11 @@ import {ethers} from 'ethers'
 import {encryptUser} from './EncryptUser'
 
 export async function mint () {
-	const contractAddress = '0x2Ff2440158aDB25A393F6539dE868b0B5F112Be6'
+	// Goerli contract Address:
+	// const contractAddress = '0x2Ff2440158aDB25A393F6539dE868b0B5F112Be6'
+
+	// Polygon Contract Adress:
+	const contractAddress ='0xe8D0B85EcfFA16430D23e5c0630D1781BDC1A2E1'
 
 	const provider = new ethers.providers.Web3Provider(window.ethereum)
 	const signer =  provider.getSigner();
@@ -17,7 +21,7 @@ export async function mint () {
 	const contractWithSigner = contract.connect(signer)
 
 	const accessControlConditions = [{
-		chain: "goerli",
+		chain: "polygon",
 		method: "balanceOf",
 		parameters: [
 			':userAddress',
