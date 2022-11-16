@@ -41,7 +41,7 @@ export default function LoadingModal(props) {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left  items-center shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-center  items-center shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="flex flex-col mt-3 text-center items-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -49,8 +49,8 @@ export default function LoadingModal(props) {
                         Your Access NFT is Minting!
                       </Dialog.Title>
                       <div className="mt-2">
-                        <p className="text-sm text-gray-500">
-                          Please confirm the NFT mint transaction in your wallet!
+                        <p className="text-sm font-bold text-gray-500">
+                          *Please confirm the NFT mint transaction in your wallet*
                         </p> <br/>
 												<p className="text-sm text-gray-500">
                           This may take a minute or so while we confirm the transaction on chain, but you only have to do this ONCE!
