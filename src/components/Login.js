@@ -3,12 +3,13 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import {useViewerConnection, EthereumAuthProvider, useViewerRecord } from "@self.id/framework"
 import styles from '../style'
 import AppNavbar from '../style_components/AppNavbar'
-
+import MintLoadingModal from '../style_components/MintLoadingModal'
 
 const Login = (props) => {
 	const record =  useViewerRecord('basicProfile');
 	const [connection, connect, disconnect] = useViewerConnection();
 	const [responseBody, setResponseBody] = useState('')
+	const [minting, setMinting] = useState(false)
 
 	const ceramic_cookie_exists = document.cookie.includes('self.id')
 
@@ -41,6 +42,7 @@ const Login = (props) => {
 			if (!responseBody.encrypted_key){
 				console.log('RECORD FROM NEW USER FUNC:', record.content)
 				const {mint} = await import('./NewUser')
+				setMinting(true)
 				const encryptedString = await mint();
 				window.sessionStorage.setItem('encrypted_string', encryptedString)
 				await record.merge({dstor_id: encryptedString})
@@ -69,12 +71,19 @@ const Login = (props) => {
 
 	useEffect(() => {
 		console.log('GOT TO USE EFFECT ON LOGIN')
-		if (data && ceramic_cookie_exists && record.content && !record.isMutating && responseBody ){
+		if (data && ceramic_cookie_exists && record.content && !record.isMutating && responseBody && !minting ){
 			console.log("NEW USER CONDITION MET")
 			newUser();
 		}
+
 	})
 	
+
+	if (minting){
+		return(
+			<MintLoadingModal />
+		)
+	}
 
 	return (
 		<Fragment>
