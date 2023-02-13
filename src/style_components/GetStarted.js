@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from '../style'
-import {arrowUp} from '../assets'
+
 
 const GetStarted = () =>  (
 		<div className={`${styles.flexCenter} w-[150px] rounded-full bg-blue-gradient p-[2px] cursor-pointer mt-5`}>

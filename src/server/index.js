@@ -8,7 +8,7 @@ const upload = multer({dest: "uploads/"})
 
 const FormData = require('form-data')
 const fs = require('fs');
-const client = require("./prod_db")
+const client = require("./db")
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
 const axios = require('axios')
@@ -149,6 +149,7 @@ app.post('/get_files', async (req, res) => {
     form.append('path', '/')
     const formHeaders = form.getHeaders()
 
+    // TODO add error handling for the post request
     await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
       headers: {
         "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,

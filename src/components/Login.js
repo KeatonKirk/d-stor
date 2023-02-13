@@ -87,7 +87,7 @@ const Login = (props) => {
 
 	return (
 		<Fragment>
-		<div>
+		<div >
 			<div className="bg-primary w-full overflow-hidden">
           <div className={`${styles.paddingX} ${styles.flexCenter}`}>
             <div className={`${styles.boxWidth}`}>
@@ -95,7 +95,7 @@ const Login = (props) => {
             </ div>
         </div>
     </div>
-		<div className="mt-10">
+		<div className={`flex-1 ${styles.flexStart} flex-col sm:px-16`} >
 		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] w-full">Upload New File</h2>
 		<input disabled ={true} type="file" className=" text-sm text-slate-500
 			file:mr-4 file:py-2 file:px-4
@@ -105,10 +105,10 @@ const Login = (props) => {
 			hover:file:bg-violet-100
 		"/>
 		<button disabled={true} className="w-[100px] rounded-full bg-sky-500">Upload</button>
-	</div>
+	
 		<br/>
 		<h2 className='font-poppins font-semibold text-[30px]'>Please Connect Wallet to access account</h2>
-
+		</div>
 	</div>
 		</Fragment>
 	)
