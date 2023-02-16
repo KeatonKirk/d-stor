@@ -27,10 +27,10 @@ function Upload(props) {
 		console.log('FILE NAME FROM UPLOAD:', file.name)
 		const user = props.user_obj
 		const accessControlConditions = user.nft_info
-    const chain = 'polygon'  
+    const chain = 'goerli'  
 
 		const file_name = file.name
-		console.log('FILES FROM DBUSER:', user, user.files)
+		console.log('FILES FROM Dstor USER:', user, user.files)
     const authSig = await JSON.parse(window.localStorage.getItem("lit-auth-signature"))
     // encryptedFile gets sent to server to upload via chainsafe
 		console.log('FILE FROM ENCRYPT FILE:', file)
@@ -48,7 +48,7 @@ function Upload(props) {
 		user.files[file_name] = [keyToStore];
 
 		const user_string = JSON.stringify(user)
-		window.sessionStorage.setItem('db_user', user_string)
+		//window.sessionStorage.setItem('db_user', user_string)
 		console.log('DB USER AFTER UPLOAD:', user)
 
 
@@ -80,10 +80,15 @@ function Upload(props) {
 		user.files[file_name].push(upload_name)
 		const stringToEncrypt = JSON.stringify(user)
 		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
+		setUploading(false)
+		inputRef.current.value = null
+		window.alert('Upload Successful!')
 		return userStringToStore
 		} catch (error) {
-			console.log(error)
-		}}
+			console.log('encrypt file threw error:', error.message)
+			throw error
+		}
+	}
 
 	const handleChange = async (e) => {
 		setFile(e.target.files[0])
@@ -98,11 +103,18 @@ function Upload(props) {
 			window.alert('Oops! File is too large. Please limit uploads to 50mb for now.')
 			return
 		}
+		try {
 		setUploading(true)
 		const userStringToStore = await encryptFile(file)
 		await record.merge({dstor_id: userStringToStore})
 		setFile(null)
 		setLoading(0)
+		} catch (error) {
+			console.log('error from upload attempt:', error.message)
+			setUploading(false)
+			inputRef.current.value = null
+			window.alert('Oops! Something went wrong. Please try again.')
+		}
 	}
 
 	useEffect(() => {
@@ -111,11 +123,11 @@ function Upload(props) {
 			props.setUser(record.content.dstor_id)
 		}
 
-		if (uploading && !file) {
-			setUploading(false)
-			inputRef.current.value = null
-			window.alert('Upload Successful!')
-		}
+		// if (uploading && !file) {
+		// 	setUploading(false)
+		// 	inputRef.current.value = null
+		// 	window.alert('Upload Successful!')
+		// }
 	
 		return 
 	},[record.isLoading, props, record.content, record, uploading, file])

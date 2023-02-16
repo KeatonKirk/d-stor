@@ -79,6 +79,8 @@ app.post("/connect_wallet", async (req, res) => {
         const json = await response.json()
         user.bucket_id = await json.id
         console.log("SESSION USER IS:", user)
+        // update db with bucket id
+        // await client.query("UPDATE users SET bucket_id=$1 WHERE address=$2 RETURNING *", [user.bucket_id, address_lc]);
         // send user back to client
         res.send(user)
       }
@@ -138,25 +140,26 @@ app.post('/get_files', async (req, res) => {
 })
 
   async function uploadFile(req,res) {
-    try {
     console.log('GOT TO FILE UPLOAD')
     const file = req.file
     console.log('request:', file)
     const uploadFile = fs.createReadStream(file.path)
     const {bucket_id}  = req.body
     const form = new FormData()
+    try {
+
     form.append('file', uploadFile, file.name)
     form.append('path', '/')
     const formHeaders = form.getHeaders()
 
-    // TODO add error handling for the post request
-    await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
+
+          await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
       headers: {
-        "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
+        "Authorization": `Bearer asdfasf`,
         formHeaders
       },
     });
-
+    
     const json = JSON.stringify(file.path);
 
     await res.send(json)
@@ -167,8 +170,15 @@ app.post('/get_files', async (req, res) => {
       console.log("Delete Upload successfully.");
     });
 
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.log(error)
+      fs.unlink('uploads/' + file.filename, (err) => {
+        if (err) {
+            throw err;
+        }
+        console.log("Delete Upload successfully.");
+      });
+      res.status(500).send(error)
     }
     res.end()
   }
