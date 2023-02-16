@@ -155,7 +155,7 @@ app.post('/get_files', async (req, res) => {
 
           await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
       headers: {
-        "Authorization": `Bearer asdfasf`,
+        "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
         formHeaders
       },
     });
