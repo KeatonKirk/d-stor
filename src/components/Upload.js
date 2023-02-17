@@ -47,8 +47,6 @@ function Upload(props) {
 
 		user.files[file_name] = [keyToStore];
 
-		const user_string = JSON.stringify(user)
-		//window.sessionStorage.setItem('db_user', user_string)
 		console.log('DB USER AFTER UPLOAD:', user)
 
 
@@ -78,12 +76,12 @@ function Upload(props) {
 		const responseString = response.data
 		const upload_name = responseString.replace('uploads/', '')
 		user.files[file_name].push(upload_name)
+		//window.sessionStorage.setItem('db_user', user_string)
 		const stringToEncrypt = JSON.stringify(user)
-		const userStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
+		const encStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
 		setUploading(false)
 		inputRef.current.value = null
-		window.alert('Upload Successful!')
-		return userStringToStore
+		return encStringToStore
 		} catch (error) {
 			console.log('encrypt file threw error:', error.message)
 			throw error
@@ -105,8 +103,9 @@ function Upload(props) {
 		}
 		try {
 		setUploading(true)
-		const userStringToStore = await encryptFile(file)
-		await record.merge({dstor_id: userStringToStore})
+		const encStringToStore = await encryptFile(file)
+		await record.merge({dstor_id: encStringToStore})
+		window.alert('Upload Successful!')
 		setFile(null)
 		setLoading(0)
 		} catch (error) {
@@ -122,12 +121,6 @@ function Upload(props) {
 			console.log("In upload useeffect")
 			props.setUser(record.content.dstor_id)
 		}
-
-		// if (uploading && !file) {
-		// 	setUploading(false)
-		// 	inputRef.current.value = null
-		// 	window.alert('Upload Successful!')
-		// }
 	
 		return 
 	},[record.isLoading, props, record.content, record, uploading, file])

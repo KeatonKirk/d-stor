@@ -5,21 +5,17 @@ import styles from '../style'
 import AppNavbar from '../style_components/AppNavbar'
 import MintLoadingModal from '../style_components/MintLoadingModal'
 
-const Login = (props) => {
+const Login = ({setAuthSig}) => {
 	const record =  useViewerRecord('basicProfile');
 	const [connection, connect, disconnect] = useViewerConnection();
-	const [responseBody, setResponseBody] = useState('')
-	const [ceramicAuth, setCeramicAuth] = useState(false)
+	const [sigsCollected, setSigsCollected] = useState(false)
 	const [minting, setMinting] = useState(false)
 
 	const ceramic_cookie_exists = document.cookie.includes('self.id')
 
-	let data = JSON.parse(window.localStorage.getItem("lit-auth-signature"))
-
 	const connectWallet = async (sig) => {
 		try {
-		const api_url = '/connect_wallet'
-		const response =  await fetch(api_url, {
+		const response =  await fetch('/connect_wallet', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -28,44 +24,31 @@ const Login = (props) => {
 		});	
 		const responseResult = await response.json()
 		console.log('response from connectWallet:', responseResult)
-		if (!responseResult.error) {
+		if (responseResult.error) {
+			console.log('no user found')
+			return null
+		} else {
 			console.log('found user')
-			//setResponseBody(db_response_body)
 			const body_string = JSON.stringify(responseResult)
 			console.log('BODY STRING;', body_string)
 			window.sessionStorage.setItem('db_user', body_string)
-			return responseResult
-		} else {
-			console.log('no user found')
-			return null
+			return responseResult;
 		}
 		} catch (error) {
 			console.log('something went wrong in wallet connect', error)
 			throw error
 		}
-
-		// window.sessionStorage.setItem('db_user', body_string);
-		// console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
 		}
 
 		const litSignIn = async () => {
-			data = await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});
+			return await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});
 		}
 
-		const newUser = async () => {
-			// below statement executes if it's  first time user login
+		const newUser = async (litAuthSig) => {
 			console.log('GOT TO NEW USER FLOW')
-			const address = data.address
+			const address = litAuthSig.address
 			
 				try {
-				console.log('RECORD FROM NEW USER FUNC:', record.content)
-				
-				const {mint} = await import('./NewUser')
-				const {encryptUser} = await import('./EncryptUser')
-				setMinting(true)
-
-				const accessControlConditions = await mint();
-				
 				const response = await fetch('/new_user', {
 					method: 'POST',
 					headers: {
@@ -74,25 +57,14 @@ const Login = (props) => {
 					body: JSON.stringify({address: address})
 				})
 				const db_user = await response.json()
-				//console.log('user from new user servercall:', await response.json())
-				db_user.nft_info = accessControlConditions
 				db_user.files = {}
 				const db_user_string = JSON.stringify(db_user)
-				
-				const {encStringToStore, responseString} = await encryptUser(db_user_string, accessControlConditions, db_user)
-				//window.sessionStorage.setItem('encrypted_string', encryptedString)
-				return {encStringToStore, responseString}
-				//await record.merge({dstor_id: encryptedString})
+				window.sessionStorage.setItem('db_user', db_user_string)
+				return {db_user}
 				} catch (error) {
 					console.log(error)
-					//window.sessionStorage.removeItem('db_user')
-					//setResponseBody('')
-					setMinting(false)
-					window.alert('Error minting NFT. Please try again.')
-					throw new Error('mint error')
+					throw error
 				}
-			
-			//props.setAuthSig(data)
 		}
 
 		const ceramicSignIn = async () => {
@@ -100,51 +72,63 @@ const Login = (props) => {
 				method: 'eth_requestAccounts',
 			})
 			await connect(new EthereumAuthProvider(window.ethereum, accounts[0]));
-			await setCeramicAuth(true)
 		}
 	
 	const handleClick = async (e) => {
-	e.preventDefault();
-	let encryptedString = ''
-	let userToStore = ''
-	try {
-		await litSignIn();
-		console.log('RECORD CONTENT after litSignIn:', record.content, data)
-		const sigToSend = JSON.stringify(data);
-		const userExists = await connectWallet(sigToSend);
-		await ceramicSignIn();
-		console.log('RECORD CONTENT after lit and ceramic sign:', record.content, connection, ceramicAuth)
+		e.preventDefault();
+		try {
+			// Get required signatures, check if there's already a user in the db for this address
+			const litAuthSig = await litSignIn();
+			const sigToSend = JSON.stringify(litAuthSig);
+			const existingUser = await connectWallet(sigToSend);
+			await ceramicSignIn();
+			console.log('RECORD CONTENT after lit and ceramic sign:', record.content, connection)
 
-		if (!userExists){
-			const {encStringToStore, responseString} = await newUser();
-			encryptedString = encStringToStore;
-			userToStore = responseString;
-			console.log('encryptedString:', encStringToStore)
-		} 
-			if (encryptedString){
-				console.log('connection status in record merge:', connection)
-				window.sessionStorage.setItem('encryptedString', encryptedString)
+				if (!existingUser){
+					// New User Flow
+					const {mint} = await import('./NewUser')
+					const {encryptUser} = await import('./EncryptUser')
+
+					// Nothing else should happen if minting fails, attempt mint first
+					setMinting(true)
+					const accessControlConditions = await mint();
+
+					const {db_user} = await newUser(litAuthSig);
+					db_user.nft_info = accessControlConditions;
+					const db_user_string = JSON.stringify(db_user)
+
+					const encStringToStore = await encryptUser(db_user_string, accessControlConditions, db_user)
+					window.sessionStorage.setItem('encryptedString', encStringToStore)
+					setSigsCollected(true)
+				} else {
+					// Existing User Flow
+					await setAuthSig(litAuthSig)
+				}
+			} catch (error) {
+			console.log('error in login', error)
+			if (!error.message === 'mint error'){
+				window.alert('Error signing in. Please try again.')
+				setMinting(false)
+			} else {
+				window.alert('Error minting NFT. Please try again.')
+				setMinting(false)
 			}
-			window.sessionStorage.setItem('db_user', userToStore)
-		} catch (error) {
-		console.log('error in login', error)
-		if (!error.message === 'mint error'){
-			window.alert('Error signing in. Please try again.')
-			setMinting(false)
-		}
-		} 
+			} 
 	}
 
 	useEffect(() => {
 		console.log('GOT TO USE EFFECT ON LOGIN')
 		const updateRecord = async () => {
-		if (data && ceramic_cookie_exists && record.content && !record.isMutating && responseBody && !minting ){
-			console.log("NEW USER CONDITION MET")
-			const encryptedString = window.sessionStorage.getItem('encryptedString')
-			await record.merge({dstor_id: encryptedString})
-			await props.setAuthSig(data)
-		}
-	}
+			const litAuthSig = localStorage.getItem('lit-auth-signature')
+			const encryptedUserString = window.sessionStorage.getItem('encryptedString')
+
+			if (ceramic_cookie_exists && record.content && !record.isMutating && encryptedUserString ){
+				console.log("NEW USER CONDITION MET")
+				await record.merge({dstor_id: encryptedUserString})
+				window.sessionStorage.removeItem('encryptedString')
+				await setAuthSig(litAuthSig)
+			}
+		}	
 	updateRecord()
 	})
 	
@@ -161,7 +145,7 @@ const Login = (props) => {
 			<div className="bg-primary w-full overflow-hidden">
           <div className={`${styles.paddingX} ${styles.flexCenter}`}>
             <div className={`${styles.boxWidth}`}>
-              <AppNavbar record={record} ceramicAuth={ceramicAuth} setCeramicAuth={setCeramicAuth} setAuthSig={props.setAuthSig} setMinting={setMinting}handleClick={handleClick} />
+              <AppNavbar handleClick={handleClick} />
             </ div>
         </div>
     </div>

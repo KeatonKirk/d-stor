@@ -43,9 +43,9 @@ export async function encryptUser (stringToEncrypt, accessControlConditions, db_
 			body: bodyString
 		});	
 		const responseJSON = await response.json();
-		const responseString = JSON.stringify(responseJSON.rows[0])
-		//window.sessionStorage.setItem('db_user', responseString)
+		const userString = JSON.stringify(responseJSON.rows[0])
+		window.sessionStorage.setItem('db_user', userString)
 		console.log("RESPONSE FROM DB UPDATE:", responseJSON.rows[0])
 		
-		return {encStringToStore, responseString}
+		return encStringToStore
   }
