@@ -9,13 +9,15 @@ const Login = (props) => {
 	const record =  useViewerRecord('basicProfile');
 	const [connection, connect, disconnect] = useViewerConnection();
 	const [responseBody, setResponseBody] = useState('')
+	const [ceramicAuth, setCeramicAuth] = useState(false)
 	const [minting, setMinting] = useState(false)
 
 	const ceramic_cookie_exists = document.cookie.includes('self.id')
 
 	let data = JSON.parse(window.localStorage.getItem("lit-auth-signature"))
 
-	const sendSig = async (sig) => {
+	const connectWallet = async (sig) => {
+		try {
 		const api_url = '/connect_wallet'
 		const response =  await fetch(api_url, {
 			method: 'POST',
@@ -24,12 +26,26 @@ const Login = (props) => {
 			},
 			body: sig
 		});	
-		const db_response_body = await response.json()
-		setResponseBody(db_response_body)
-		const body_string = JSON.stringify(db_response_body)
-		console.log('BODY STRING;', body_string)
-		window.sessionStorage.setItem('db_user', body_string);
-		console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
+		const responseResult = await response.json()
+		console.log('response from connectWallet:', responseResult)
+		if (!responseResult.error) {
+			console.log('found user')
+			//setResponseBody(db_response_body)
+			const body_string = JSON.stringify(responseResult)
+			console.log('BODY STRING;', body_string)
+			window.sessionStorage.setItem('db_user', body_string)
+			return responseResult
+		} else {
+			console.log('no user found')
+			return null
+		}
+		} catch (error) {
+			console.log('something went wrong in wallet connect', error)
+			throw error
+		}
+
+		// window.sessionStorage.setItem('db_user', body_string);
+		// console.log("DBUSER FROM INITIAL LOGIN:", window.sessionStorage.getItem("db_user"))
 		}
 
 		const litSignIn = async () => {
@@ -39,15 +55,44 @@ const Login = (props) => {
 		const newUser = async () => {
 			// below statement executes if it's  first time user login
 			console.log('GOT TO NEW USER FLOW')
-			if (!responseBody.encrypted_key){
+			const address = data.address
+			
+				try {
 				console.log('RECORD FROM NEW USER FUNC:', record.content)
+				
 				const {mint} = await import('./NewUser')
+				const {encryptUser} = await import('./EncryptUser')
 				setMinting(true)
-				const encryptedString = await mint();
-				window.sessionStorage.setItem('encrypted_string', encryptedString)
-				await record.merge({dstor_id: encryptedString})
-			}
-			props.setAuthSig(data)
+
+				const accessControlConditions = await mint();
+				
+				const response = await fetch('/new_user', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+						},
+					body: JSON.stringify({address: address})
+				})
+				const db_user = await response.json()
+				//console.log('user from new user servercall:', await response.json())
+				db_user.nft_info = accessControlConditions
+				db_user.files = {}
+				const db_user_string = JSON.stringify(db_user)
+				
+				const {encStringToStore, responseString} = await encryptUser(db_user_string, accessControlConditions, db_user)
+				//window.sessionStorage.setItem('encrypted_string', encryptedString)
+				return {encStringToStore, responseString}
+				//await record.merge({dstor_id: encryptedString})
+				} catch (error) {
+					console.log(error)
+					//window.sessionStorage.removeItem('db_user')
+					//setResponseBody('')
+					setMinting(false)
+					window.alert('Error minting NFT. Please try again.')
+					throw new Error('mint error')
+				}
+			
+			//props.setAuthSig(data)
 		}
 
 		const ceramicSignIn = async () => {
@@ -55,27 +100,52 @@ const Login = (props) => {
 				method: 'eth_requestAccounts',
 			})
 			await connect(new EthereumAuthProvider(window.ethereum, accounts[0]));
+			await setCeramicAuth(true)
 		}
 	
 	const handleClick = async (e) => {
 	e.preventDefault();
+	let encryptedString = ''
+	let userToStore = ''
+	try {
+		await litSignIn();
+		console.log('RECORD CONTENT after litSignIn:', record.content, data)
+		const sigToSend = JSON.stringify(data);
+		const userExists = await connectWallet(sigToSend);
+		await ceramicSignIn();
+		console.log('RECORD CONTENT after lit and ceramic sign:', record.content, connection, ceramicAuth)
 
-	await litSignIn();
-	console.log('RECORD CONTENT after litSignIn:', record.content)
-	const sigToSend = JSON.stringify(data);
-	await sendSig(sigToSend);
-	console.log('RECORD CONTENT after send sig:', record.content)
-	await ceramicSignIn();
-	console.log('RECORD CONTENT after ceramic sign:', record.content)
-	} 
+		if (!userExists){
+			const {encStringToStore, responseString} = await newUser();
+			encryptedString = encStringToStore;
+			userToStore = responseString;
+			console.log('encryptedString:', encStringToStore)
+		} 
+			if (encryptedString){
+				console.log('connection status in record merge:', connection)
+				window.sessionStorage.setItem('encryptedString', encryptedString)
+			}
+			window.sessionStorage.setItem('db_user', userToStore)
+		} catch (error) {
+		console.log('error in login', error)
+		if (!error.message === 'mint error'){
+			window.alert('Error signing in. Please try again.')
+			setMinting(false)
+		}
+		} 
+	}
 
 	useEffect(() => {
 		console.log('GOT TO USE EFFECT ON LOGIN')
+		const updateRecord = async () => {
 		if (data && ceramic_cookie_exists && record.content && !record.isMutating && responseBody && !minting ){
 			console.log("NEW USER CONDITION MET")
-			newUser();
+			const encryptedString = window.sessionStorage.getItem('encryptedString')
+			await record.merge({dstor_id: encryptedString})
+			await props.setAuthSig(data)
 		}
-
+	}
+	updateRecord()
 	})
 	
 
@@ -91,7 +161,7 @@ const Login = (props) => {
 			<div className="bg-primary w-full overflow-hidden">
           <div className={`${styles.paddingX} ${styles.flexCenter}`}>
             <div className={`${styles.boxWidth}`}>
-              <AppNavbar handleClick={handleClick} />
+              <AppNavbar record={record} ceramicAuth={ceramicAuth} setCeramicAuth={setCeramicAuth} setAuthSig={props.setAuthSig} setMinting={setMinting}handleClick={handleClick} />
             </ div>
         </div>
     </div>

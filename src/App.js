@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Provider } from '@self.id/framework';
 import {BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './components/Home'
+
 import styles from './style'
 import Navbar  from './style_components/Navbar'
 

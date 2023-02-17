@@ -50,57 +50,96 @@ app.post("/connect_wallet", async (req, res) => {
   //session = req.session;
   const authSig = req.body;
   const address = authSig.address
+  console.log("ADDRESS:", address)
   const response = await client.query('SELECT * FROM users WHERE address = $1', [address])
   
   // new user signup flow - no user in db with matching address
-  if (!response.rows[0]) {
-    console.log("New user signup flow goes here")
-    // add new user address to db, store user object in session
-    const address_lc = await address.toLowerCase();
-    const newUser = await client.query("INSERT INTO users (address) VALUES($1) RETURNING *", [address_lc]);
+  // if (!response.rows[0]) {
+  //   console.log("New user signup flow goes here")
+  //   // add new user address to db, store user object in session
+  //   const address_lc = await address.toLowerCase();
+  //   const newUser = await client.query("INSERT INTO users (address) VALUES($1) RETURNING *", [address_lc]);
 
-    console.log("NEW USER:", newUser.rows[0])
-    const user = newUser.rows[0];
-    // create new chainsafe bucket, store info in session and push to db
-    try {
-      const newBucket = async () => {
-        const body = {
-          name: address_lc,
-          type: 'fps'
-        }
-        const response = await fetch('https://api.chainsafe.io/api/v1/buckets', {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
-          },
-          body: JSON.stringify(body)
-        })
-        const json = await response.json()
-        user.bucket_id = await json.id
-        console.log("SESSION USER IS:", user)
-        // update db with bucket id
-        // await client.query("UPDATE users SET bucket_id=$1 WHERE address=$2 RETURNING *", [user.bucket_id, address_lc]);
-        // send user back to client
-        res.send(user)
-      }
-      newBucket();
-    } catch (error) {
-      console.log(error)
-    }
-    return;
-  }
+  //   console.log("NEW USER:", newUser.rows[0])
+  //   const user = newUser.rows[0];
+  //   // create new chainsafe bucket, store info in session and push to db
+  //   try {
+  //     const newBucket = async () => {
+  //       const body = {
+  //         name: address_lc,
+  //         type: 'fps'
+  //       }
+  //       const response = await fetch('https://api.chainsafe.io/api/v1/buckets', {
+  //         method: "post",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
+  //         },
+  //         body: JSON.stringify(body)
+  //       })
+  //       const json = await response.json()
+  //       user.bucket_id = await json.id
+  //       console.log("SESSION USER IS:", user)
+  //       // update db with bucket id
+  //       // await client.query("UPDATE users SET bucket_id=$1 WHERE address=$2 RETURNING *", [user.bucket_id, address_lc]);
+  //       // send user back to client
+  //       res.send(user)
+  //     }
+  //     newBucket();
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  //   return;
+  // }
 
   // Found existing user flow
   try {
     const currentUser = response.rows[0]
-    const user = currentUser;
-    console.log(user)
-    return res.json(currentUser)
+    console.log('user from db:', currentUser)
+    if (!currentUser) {
+      console.log("No user found in db")
+      return res.send({error: "No user found in db"})
+    }
+    return res.send(currentUser)
   } catch (error) {
     console.log(error)
+    return res.send(error)
   }
 });
+
+app.post('/new_user', async (req, res) => {
+  const {address} = req.body;
+  const address_lc = await address.toLowerCase();
+  const newUser = await client.query("INSERT INTO users (address) VALUES($1) RETURNING *", [address_lc]);
+  console.log("NEW USER:", newUser.rows[0])
+  const user = newUser.rows[0];
+  // create new chainsafe bucket, store info in session and push to db
+  try {
+    const newBucket = async () => {
+      const body = {
+        name: address_lc,
+        type: 'fps'
+      }
+      const response = await fetch('https://api.chainsafe.io/api/v1/buckets', {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
+        },
+        body: JSON.stringify(body)
+      })
+      const json = await response.json()
+      user.bucket_id = await json.id
+      console.log("SESSION USER IS:", user)
+      // send user back to client
+      res.send(user)
+    }
+    newBucket();
+  } catch (error) {
+    console.log(error)
+    res.send(error)
+  }
+})
 
 //update db with encrypted key and access control info
 app.post('/update', async (req, res) => {
