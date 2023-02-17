@@ -8,7 +8,7 @@ const upload = multer({dest: "uploads/"})
 
 const FormData = require('form-data')
 const fs = require('fs');
-const client = require("./db")
+const client = require("./prod_db")
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
 const axios = require('axios')
