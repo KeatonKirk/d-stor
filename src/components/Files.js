@@ -3,7 +3,7 @@ import Download from './Download'
 import folderIcon from '../assets/folder.png'
 
 
-const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen}) => {
+const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, searchResults}) => {
 
 	const filesArrayRef =  useRef([])
 	const files = filesRef.current
@@ -57,16 +57,16 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen})
 		useEffect(() => {
 			handleFolderChange(currentFolderRef.current)
 			setCurrentFolders(currentFolderRef.current === '/' ? '/' : currentFolderRef.current.split('/'))
-			console.log('current folders from useEffect:', currentFolders )
+			console.log('current folders from useEffect:', currentFolderRef.current )
 		}
-		, [foldersRef.current, currentFolderRef.current])
+		, [foldersRef.current, currentFolderRef.current, searchResults])
 
 
 	if (filesArrayRef.length !== 0) {
 		return (
 		<>
 			<div style={{display: 'flex', flexDirection: 'row', marginBottom: '20px'}}>
-				<button className="hover:bg-gray-300 rounded-md" style={{fontWeight: 'bold', marginRight: '10px'}} onClick={() => handleFolderChange('/')}>Home</button>
+				<button className="hover:bg-gray-300 rounded-md" style={{fontWeight: 'bold', marginRight: '10px'}} onClick={() => handleFolderChange('/', user_files, prop_files)}>Home</button>
 				{currentFolderRef.current.split('/').map((folder, index) => {
 					const path = currentFolderRef.current.split('/').slice(0, index + 1).join('/');
 					console.log('folder nav info:', currentFolderRef.current, currentFolderRef.current.split('/'), path, folder, index)
@@ -76,7 +76,7 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen})
 					return (
 						<div key={index}>
 							{'>'}
-							<button className="hover:bg-gray-300 rounded-md" style={{fontWeight: 'bold',marginRight: '10px', marginLeft: '10px'}} onClick={() => handleFolderChange(path)}> {folder} </button>
+							<button className="hover:bg-gray-300 rounded-md" style={{fontWeight: 'bold',marginRight: '10px', marginLeft: '10px'}} onClick={() => handleFolderChange(path, user_files, prop_files)}> {folder} </button>
 						</div>
 					)
 					}
