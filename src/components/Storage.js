@@ -15,9 +15,12 @@ const Storage = (props) => {
   const [string, setString] = useState();
   const [user, setUser ] = useState(null);
   //const [uploading, setUploading] = useState(false)
-  const bucket_id = useRef();
-  const user_obj = useRef();
-  const files = useRef();
+  const bucket_idRef = useRef();
+  const user_objRef = useRef();
+  const filesRef = useRef();
+  const foldersRef = useRef();
+  const currentFolderRef = useRef('/');
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   console.log('STORAGE COMPONENT RENDERED. USER:', user)
   const client = new LitJsSdk.LitNodeClient();
@@ -73,10 +76,13 @@ const Storage = (props) => {
   if (string){
     const user_obj_json = JSON.parse(string)
     const bucket = user_obj_json.bucket_id
+    const folders = user_obj_json.folders
+    const files = user_obj_json.files
     console.log('Dstor user OBJECT IN STORAGE:', user_obj_json)
-    bucket_id.current = bucket
-    user_obj.current = user_obj_json
-    files.current = user_obj_json.files
+    bucket_idRef.current = bucket
+    user_objRef.current = user_obj_json
+    filesRef.current = files
+    foldersRef.current = folders
   }
 
 
@@ -92,7 +98,7 @@ const Storage = (props) => {
     return
   },[connect, connection.status])
 
-  if (bucket_id.current){
+  if (bucket_idRef.current){
     return (
       <div>
 
@@ -106,9 +112,9 @@ const Storage = (props) => {
 
           <div className={`flex-1 ${styles.flexStart} flex-col sm:px-16`}>
           <div className="flex flex-col justify-between items-left w-full">
-            <Upload bucket_id={bucket_id.current} user_obj={user_obj.current} setUser={setUser}/>
+            <Upload modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} bucket_id={bucket_idRef.current} user_obj={user_objRef.current} setUser={setUser} currentFolderRef={currentFolderRef} foldersRef={foldersRef}/>
             <br></br>
-            <Files bucket_id={bucket_id.current} files={files.current}/>
+            <Files modalIsOpen={modalIsOpen} bucket_id={bucket_idRef.current} filesRef={filesRef} foldersRef={foldersRef} currentFolderRef={currentFolderRef}/>
           </div>
           </div>
     </div>

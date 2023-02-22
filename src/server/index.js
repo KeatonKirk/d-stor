@@ -8,7 +8,13 @@ const upload = multer({dest: "uploads/"})
 
 const FormData = require('form-data')
 const fs = require('fs');
-const client = require("./prod_db")
+
+//prod db
+//const client = require("./prod_db")
+
+//dev db
+const client = require("./db")
+
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
 const axios = require('axios')
@@ -139,26 +145,29 @@ app.post('/get_files', async (req, res) => {
 })
 
   async function uploadFile(req,res) {
-    console.log('GOT TO FILE UPLOAD')
+    console.log('GOT TO FILE UPLOAD', req.body)
     const file = req.file
     console.log('request:', file)
     const uploadFile = fs.createReadStream(file.path)
-    const {bucket_id}  = req.body
+    const {bucket_id, folder}  = req.body
+
     const form = new FormData()
     try {
 
     form.append('file', uploadFile, file.name)
-    form.append('path', '/')
+
+    // TO DO input folder path here instead of root route
+    form.append('path', folder)
     const formHeaders = form.getHeaders()
 
-
-          await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
+    await axios.post(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/upload`, form, {
       headers: {
         "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
         formHeaders
       },
     });
     
+    // file.path is the name that the file is stored as in the bucket
     const json = JSON.stringify(file.path);
 
     await res.send(json)
@@ -184,11 +193,34 @@ app.post('/get_files', async (req, res) => {
 
   app.post('/upload', upload.single('file'), uploadFile);
 
-  app.post('/download', async (req, res) => {
+  //TO DO check copilot's code here
+  app.post('/new_folder', async (req, res) => {
+    console.log("GOT TO NEW FOLDER ROUTE")
+    const {bucket_id, path} = req.body
+    console.log('bucket Id and folder name:', req.body)
 
+    const body = {
+      path: '/' + path
+      }
+      const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/mkdir`, {
+        method: 'post',
+        headers: {
+          "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`,
+          "Content-Type": 'application/json'
+          },
+          body: JSON.stringify(body)
+        })
+        const json = await response.json()
+        console.log("NEW FOLDER RESPONSE:", json)
+        res.send(json)
+  })
+
+  app.post('/download', async (req, res) => {
+    console.log("GOT TO DOWNLOAD ROUTE", req.body)
     try{
-      const {bucket_id, file_path, file_name} = req.body
-      const file_path_string = '/' + file_path;
+      const {bucket_id, file_path, file_name, folder} = req.body
+      const file_path_string = folder + '/' + file_path;
+      console.log("FILE PATH STRING:", file_path_string)
       const body = {
         path: file_path_string
       }
@@ -215,6 +247,7 @@ app.post('/get_files', async (req, res) => {
     
     } catch (err) {
       console.log(err)
+      res.status(500).send(err)
     }
   })
 

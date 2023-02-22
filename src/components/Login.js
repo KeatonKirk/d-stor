@@ -58,6 +58,7 @@ const Login = ({setAuthSig}) => {
 				})
 				const db_user = await response.json()
 				db_user.files = {}
+				db_user.folders = []
 				const db_user_string = JSON.stringify(db_user)
 				window.sessionStorage.setItem('db_user', db_user_string)
 				return {db_user}

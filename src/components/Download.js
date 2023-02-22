@@ -9,16 +9,18 @@ const [file, setFile] = useState(true)
 
 const file_list = props.files
 const file_path = file_list[props.file_name][1]
-const bucket_id = props.bucket_id.bucket_id
-
+const bucket_id = props.bucket_id
+const folder = file_list[props.file_name][2]
+console.log('PROPS IN DOWNLOAD FROM FILES COMP',file_list, props.file_name, file_path, bucket_id.bucket_id, folder )
 const handleClick = async () => {
 	setDownloading(true)
 	console.log('click handler')
-	console.log('PROPS IN DOWNLOAD FROM FILES COMP',file_list, file_path, bucket_id.bucket_id )
+	console.log('PROPS IN DOWNLOAD FROM FILES COMP',file_list, file_path, bucket_id.bucket_id, folder )
 	const body = {
 		bucket_id: bucket_id,
 		file_path: file_path,
-		file_name: props.file_name
+		file_name: props.file_name,
+		folder: folder
 	}
 	
 	const body_string = JSON.stringify(body)

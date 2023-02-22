@@ -3,19 +3,22 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import {encryptUser} from './EncryptUser';
 import { useViewerRecord } from "@self.id/framework";
 import axios from 'axios';
+import Modal from 'react-modal';
 
 // take file input from user
 // encrypt file with lit
 // call server to proxy upload call to chainsafe api
 // add file list to ceramic user files array
 
-function Upload(props) {
+function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, modalIsOpen, setModalIsOpen }) {
 	const [file, setFile] = useState(null)
 	const [uploading, setUploading] = useState(false)
 	const [loading, setLoading] = useState(0)
 	const inputRef = useRef(null)
+	const newFolderRef = useRef(null)
 	const record = useViewerRecord('basicProfile')
 	
+	console.log('UPLOAD COMPONENT RENDERED. USER:', user_obj, bucket_id, currentFolderRef.current)
 
 	const encryptFile = async (file) => {
 		const client = await new LitJsSdk.LitNodeClient();
@@ -25,7 +28,8 @@ function Upload(props) {
       await client.connect()
     } 
 		console.log('FILE NAME FROM UPLOAD:', file.name)
-		const user = props.user_obj
+		const currentFolder = currentFolderRef.current
+		const user = user_obj
 		const accessControlConditions = user.nft_info
     const chain = 'goerli'  
 
@@ -52,14 +56,14 @@ function Upload(props) {
 
 		const formData = new FormData()
 		formData.append('file', encryptedFile)
-		formData.append('bucket_id', props.bucket_id)
+		formData.append('bucket_id', bucket_id)
 		formData.append('file_name', file.name)
+		formData.append('folder', currentFolder)
 
-		const api_url = '/upload'
 		try {
 			const response =  await axios({
 			method: 'post',
-			url: api_url,
+			url: '/upload',
 			data: formData,
 			headers: {
 				'Content-Type': 'multipart/form-data'
@@ -74,9 +78,13 @@ function Upload(props) {
 
 		console.log('REPSONSE FROM UPLOAD:', response)
 		const responseString = response.data
+
+		//Below get's the filestream upload name from the response string, 
+		//added to the array of objects which maps to the key which is the actual file name entered by user
+
 		const upload_name = responseString.replace('uploads/', '')
 		user.files[file_name].push(upload_name)
-		//window.sessionStorage.setItem('db_user', user_string)
+		user.files[file_name].push(currentFolder)
 		const stringToEncrypt = JSON.stringify(user)
 		const encStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
 		setUploading(false)
@@ -85,6 +93,49 @@ function Upload(props) {
 		} catch (error) {
 			console.log('encrypt file threw error:', error.message)
 			throw error
+		}
+	}
+
+	const newFolder = async (e) => {
+		e.preventDefault()
+
+		const user = user_obj
+		const accessControlConditions = user.nft_info
+		const getPath = async () => {
+			if (currentFolderRef.current === '/') {
+				return currentFolderRef.current + newFolderRef.current.value
+			} else {
+				return currentFolderRef.current + '/' + newFolderRef.current.value
+			}
+		} 
+
+		const path = await getPath()
+		console.log('data in new folder func', newFolderRef.current.value, bucket_id)
+		const body = {
+			path: path,
+			bucket_id: bucket_id
+		}
+		console.log('body in new folder func', body)
+		try {
+		const response = await axios({
+			method: 'POST',
+			url: '/new_folder',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			data: body,
+		})
+		console.log('new folder response:', response)
+
+		user.folders.push(path)
+		const stringToEncrypt = JSON.stringify(user)
+		const encStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
+		await record.merge({dstor_id: encStringToStore})
+		console.log('new folder response:', response)
+		foldersRef.current.push(path)
+		setModalIsOpen(false)
+		} catch (error) {
+			console.log('error from new folder attempt:', error.message)
 		}
 	}
 
@@ -115,16 +166,37 @@ function Upload(props) {
 			window.alert('Oops! Something went wrong. Please try again.')
 		}
 	}
+	const customStyles = {
+		content: {
+			top: '50%',
+			left: '50%',
+			right: 'auto',
+			bottom: 'auto',
+			marginRight: '-50%',
+			transform: 'translate(-50%, -50%)',
+			maxWidth: '400px', // set max width of the modal
+			maxHeight: '80vh', // set max height of the modal
+		},
+	};
+	
 
 	useEffect(() => {
 		if (!record.isLoading && record.content && !record.isMutating && record.content.dstor_id && !uploading) {
 			console.log("In upload useeffect")
-			props.setUser(record.content.dstor_id)
+			setUser(record.content.dstor_id)
 		}
 	
 		return 
-	},[record.isLoading, props, record.content, record, uploading, file])
-	
+	},[record.isLoading, record.content, record, uploading, file])
+
+	useEffect(() => {
+		if (file) {
+			handleSubmit()
+		}
+	}, [file])
+
+
+
 	if (uploading) {
 		return(
 		<>
@@ -151,7 +223,7 @@ function Upload(props) {
 	}
 	return (
 	<div className="mt-10">
-		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] w-full">Upload New File</h2>
+		<p className="font-poppins font-semibold xs:text-[35px] text-black xs:leading-[76.8px] leading-[66.8px] w-full" style={{fontSize: '30px'}}>Upload New File</p>
 		<input ref={inputRef} type="file" className=" text-sm text-slate-500
 			file:mr-4 file:py-2 file:px-4
 			file:rounded-full file:border-0
@@ -159,8 +231,23 @@ function Upload(props) {
 			file:bg-sky-50 file:text-sky-500
 			hover:file:bg-violet-100
 		"
+		title="Upload a file"
 		onChange={handleChange}/>
-		<button disabled={!file} onClick={handleSubmit} className="w-[100px] rounded-full bg-sky-500">Upload</button>
+		<div >
+			<button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700 mt-10" onClick={() => setModalIsOpen(true)}>Add Folder</button>
+			<div>
+				<Modal isOpen={modalIsOpen} style={customStyles}>
+					<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+						<form onSubmit={newFolder}>
+							<label>New Folder Name:</label>
+							<input style={{border: '1px solid #ccc'}} type="text" ref={newFolderRef} />
+							<button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" type="submit">Submit</button>
+						</form>
+						<button onClick={() => setModalIsOpen(false)}>close</button>
+					</div>
+				</Modal>
+			</div>
+		</div>
 	</div>
 
 	)
