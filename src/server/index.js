@@ -10,10 +10,10 @@ const FormData = require('form-data')
 const fs = require('fs');
 
 //prod db
-//const client = require("./prod_db")
+const client = require("./prod_db")
 
 //dev db
-const client = require("./db")
+//const client = require("./db")
 
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
