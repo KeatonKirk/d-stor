@@ -1,14 +1,21 @@
 import {useRef, useState, useEffect} from 'react'
 import Download from './Download'
 import folderIcon from '../assets/folder.png'
+import { HiDotsVertical, HiTrash, HiPencil } from "react-icons/hi";
+import RenameFile from './RenameFile'
+import DeleteFile from './DeleteFile'
 
 
-const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, searchResults}) => {
+const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, searchResults, user}) => {
 
 	const filesArrayRef =  useRef([])
 	const files = filesRef.current
 	const [currentFiles, setCurrentFiles] = useState(filesRef.current)
 	const [currentFolders, setCurrentFolders] = useState(['/'])
+	const [showOptions, setShowOptions] = useState(null)
+	const [editingName, setEditingName] = useState(null)
+	const [deletingFile, setDeletingFile] = useState(null)
+	const [downloading, setDownloading] = useState(false)
 	const user_files = Object.keys(filesRef.current)
 	const prop_files = filesRef.current
 
@@ -51,6 +58,22 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, 
 			}
 			setCurrentFiles(filesArrayRef.current)
 			console.log('FILES AFTER FOLDER CLICK:', filesArrayRef.current)
+		}
+
+		const handleOptionsClick = (file) => {
+			console.log('options clicked:', file)
+			setShowOptions(file)
+		}
+
+		const handleEditNameClick = (file) => {
+			console.log('edit name clicked:',file)
+			setEditingName(file)
+		}
+
+		const handleDeleteClick = (file) => {
+			console.log('delete clicked:', file)
+			setDeletingFile(file)
+			setShowOptions(null)
 		}
 
 
@@ -117,7 +140,7 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, 
 											scope="col"
 											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
 										>
-											<span> Download</span>
+											<span> Options</span>
 										</th>
 									</tr>
 								</thead>
@@ -126,9 +149,34 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, 
 								>
 									{filesArrayRef.current.map(file => (
 										<tr className="hover:bg-slate-400">
+											{editingName === file ? (
+												<RenameFile setShowOptions={setShowOptions} user={user} file={file} setEditingName={setEditingName} />
+											) : (
+												<>
 										<td className="" key={file}>{file}</td>
-										<td><Download bucket_id={bucket_id} file_name={file} files={prop_files} /> </td>  
-										</tr>
+										<td style={{display: 'flex', marginLeft: '30px'}}>
+											<button onClick={() => handleOptionsClick(file)}><HiDotsVertical size={30}/></button>
+											{showOptions === file && (
+												<div className="absolute z-10">
+													<div className="fixed inset-0" onClick={() => setShowOptions(null)} />
+													<div className="origin-top-left absolute right-auto w-56 mt-2 bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+														<div className="py-1" style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+															<div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+																<button className="block hover:bg-gray-300 rounded-md" onClick={() => handleEditNameClick(file)}><HiPencil size={30}/>Edit</button>
+															</div>
+																<button onClick={() => handleDeleteClick(file)}className="block hover:bg-gray-300 rounded-md"><HiTrash size={30}/>Delete</button>
+																<Download bucket_id={bucket_id} file_name={file} files={prop_files} />
+														</div>
+													</div>
+												</div>
+											)}
+										</td> 
+										</>
+											)} 
+										{deletingFile === file && (
+											<DeleteFile user={user} bucket_id={bucket_id} currentFolderRef={currentFolderRef} file={file} setDeletingFile={setDeletingFile} deletingFile={deletingFile} />
+										)}
+								</tr>
 									))}
 								</tbody>
 							</table>

@@ -193,6 +193,28 @@ app.post('/get_files', async (req, res) => {
 
   app.post('/upload', upload.single('file'), uploadFile);
 
+  app.post('/delete_file', async (req, res) => {
+    const {bucket_id, path} = req.body
+    console.log('bucket Id and file path:', req.body)
+    const body = {
+      path: path
+    }
+    const body_string = JSON.stringify(body)
+    try {
+      const response = await fetch(`https://api.chainsafe.io/api/v1/bucket/${bucket_id}/rm`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.REACT_APP_CHAINSAFE_KEY}`
+        },
+        body: body_string
+      })
+      console.log("DELETE RESPONSE:", response)
+    } catch (error) {
+      res.status(500).send(error)
+    }
+  })
+
   //TO DO check copilot's code here
   app.post('/new_folder', async (req, res) => {
     console.log("GOT TO NEW FOLDER ROUTE")

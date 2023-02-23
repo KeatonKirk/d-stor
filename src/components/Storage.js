@@ -66,39 +66,6 @@ const Storage = (props) => {
     }
   }
 
-  // function getCurrentFolders () {
-	// 	const directDescendants = foldersRef.current.filter(folder => {
-	// 		// Check if the folder starts with the current folder path followed by a slash
-	// 		const grandChildren = folder.replace(currentFolderRef.current + '/', '');
-	// 		const isDirectDescendant = folder.startsWith(currentFolderRef.current + "/") && !grandChildren.slice(1).includes('/');
-	// 		// If the current folder is '/', only return folders that don't have additional slashes
-	// 		console.log('folder slice:', folder, folder.slice(1), folder.slice(1).includes('/'))
-	// 		const isRootDirectDescendant = currentFolderRef.current === '/' && !folder.slice(1).includes('/');
-	// 		return isDirectDescendant || isRootDirectDescendant;
-	// 	});
-	
-	// 	return directDescendants;
-	// }
-
-	// const foldersArrayRef = useRef(getCurrentFolders())
-  // const filesArrayRef =  useRef([])
-
-  // const handleFolderChange = async (folder, user_files, prop_files) => {
-  //   console.log('FOLDER CLICKED:', folder, filesRef.current)
-  //   currentFolderRef.current = await folder
-  //   foldersArrayRef.current = await getCurrentFolders()
-  //   filesArrayRef.current = []
-  //   console.log('FILES AFTER FOLDER CLICK:', filesRef.current)
-  //   for (let file of user_files){
-  //     console.log('current folder after folder click:', currentFolderRef.current)
-  //     if (prop_files[file][2] === currentFolderRef.current) {
-  //       filesArrayRef.current.push(file)
-  //     }
-  //   }
-  //   // setCurrentFiles(filesArrayRef.current)
-  //   console.log('FILES AFTER FOLDER CLICK:', filesArrayRef.current)
-  // }
-
   const handleDisconnect = async () => {
     disconnect();
     window.localStorage.removeItem("lit-auth-signature")
@@ -150,7 +117,7 @@ const Storage = (props) => {
             <SearchBar setSearchResults={setSearchResults} filesRef={filesRef} foldersRef={foldersRef} currentFolderRef={currentFolderRef}/>
             <Upload modalIsOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} bucket_id={bucket_idRef.current} user_obj={user_objRef.current} setUser={setUser} currentFolderRef={currentFolderRef} foldersRef={foldersRef}/>
             <br></br>
-            <Files  modalIsOpen={modalIsOpen} bucket_id={bucket_idRef.current} filesRef={filesRef} foldersRef={foldersRef} currentFolderRef={currentFolderRef}/>
+            <Files user={user_objRef.current} modalIsOpen={modalIsOpen} bucket_id={bucket_idRef.current} filesRef={filesRef} foldersRef={foldersRef} currentFolderRef={currentFolderRef}/>
           </div>
           </div>
     </div>

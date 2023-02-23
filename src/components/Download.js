@@ -77,9 +77,9 @@ if (downloading) {
 	)
 }
 	return (
-		<span className="ml-[20px] w-[100px]">
-		<button className="" onClick={handleClick}><HiOutlineDownload size={30}/></button>
-		</span>
+		<div >
+		<button className="hover:bg-gray-300 rounded-md" onClick={handleClick}><HiOutlineDownload size={30}/>Download</button>
+		</div>
 	)
 }
 
