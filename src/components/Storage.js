@@ -42,7 +42,7 @@ const Storage = (props) => {
     console.log('user object from record:', stringToDecrypt)
     // convert base64 string to blob
     const encryptedString = LitJsSdk.base64StringToBlob(stringToDecrypt)
-    const chain = 'goerli'
+    const chain = 'polygon'
     const encryptedSymmetricKey = db_user.encrypted_key
     console.log('stuff needed to get symmetric key:', accessControlConditions, encryptedSymmetricKey, chain, authSig)
     const symmetricKey = await window.litNodeClient.getEncryptionKey({

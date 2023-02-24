@@ -42,7 +42,7 @@ const Login = ({setAuthSig}) => {
 		}
 
 		const litSignIn = async () => {
-			return await LitJsSdk.checkAndSignAuthMessage({chain: "goerli",});
+			return await LitJsSdk.checkAndSignAuthMessage({chain: "polygon",});
 		}
 
 		const newUser = async (litAuthSig) => {

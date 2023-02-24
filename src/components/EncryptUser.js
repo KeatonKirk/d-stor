@@ -10,7 +10,7 @@ export async function encryptUser (stringToEncrypt, accessControlConditions, db_
       await client.connect()
     } 
 
-    const chain = 'goerli'  
+    const chain = 'polygon'  
     const authSig = await JSON.parse(window.localStorage.getItem("lit-auth-signature"))
     // encrypting a string using access control conditions and authsig from existing app state
     const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(stringToEncrypt);

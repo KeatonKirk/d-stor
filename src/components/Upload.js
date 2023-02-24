@@ -33,7 +33,7 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 		const currentFolder = currentFolderRef.current
 		const user = user_obj
 		const accessControlConditions = user.nft_info
-    const chain = 'goerli'  
+    const chain = 'polygon'  
 
 		console.log('UPLOAD COMPONENT RENDERED. USER:', user, bucket_id, currentFolderRef.current)
 

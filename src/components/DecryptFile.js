@@ -11,7 +11,7 @@ export async function decryptFile (encryptedFile, encryptedSymmetricKey, fileNam
 		console.log('ARGS IN DECRYPT FILE:', encryptedFile, encryptedSymmetricKey)
 		const db_user = await JSON.parse(sessionStorage.getItem('db_user'))
 		const accessControlConditions = [db_user.nft_info]
-    const chain = 'goerli'  
+    const chain = 'polygon'  
     const authSig = await JSON.parse(window.localStorage.getItem("lit-auth-signature"))
 		const symmetricKey = await window.litNodeClient.getEncryptionKey({
       accessControlConditions,
