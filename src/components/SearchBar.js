@@ -1,5 +1,6 @@
 import React, {useRef, useState, useEffect} from 'react';
 import folderIcon from '../assets/folder.png';
+import { AiFillFileText } from "react-icons/ai";
 
 function SearchBar({filesRef, foldersRef, currentFolderRef, setSearchResults}) {
 	const [search, setSearch] = useState('')
@@ -23,12 +24,14 @@ function SearchBar({filesRef, foldersRef, currentFolderRef, setSearchResults}) {
 		if (folder.includes(fileResult)) {
 			currentFolderRef.current = await folder
 			setSearchResults(fileResult)
+			setImageIcon(<img style={{width: '15px', height: '15px', marginRight: '10px'}} src={folderIcon} alt="folder" />)
 		}
 	}
 		if (filesRef.current[fileResult]) {
 			console.log('file clicked:', filesRef.current[fileResult])
 			currentFolderRef.current = await filesRef.current[fileResult][2]
 			setSearchResults(fileResult)
+			setImageIcon(<AiFillFileText size={20}/>)
 		}
 		console.log('current folder after click in search:', currentFolderRef.current)
 		setSearch('')
@@ -52,14 +55,16 @@ function SearchBar({filesRef, foldersRef, currentFolderRef, setSearchResults}) {
 			
 			for (let file of Object.keys(filesRef.current)) {
 				if (file.toLowerCase().includes(search)) {
-					results.push(file)
+					const icon = <AiFillFileText style={{marginRight: '5px'}} size={20} />
+					results.push({item: file, icon: icon})
 				}
 			}
 			for (let folder of foldersRef.current) {
 					const foldersArray = folder.split('/')
 					const lastFolder = foldersArray[foldersArray.length - 1]
 				if (lastFolder.toLowerCase().includes(search)) {
-					results.push(lastFolder)
+					const icon = <img style={{width: '15px', height: '15px', marginRight: '10px'}} src={folderIcon} alt="folder" />
+					results.push({item: lastFolder, icon: icon})
 				}
 			}
 			setResults(results)
@@ -68,13 +73,20 @@ function SearchBar({filesRef, foldersRef, currentFolderRef, setSearchResults}) {
 
 	return (
 		<div>
-			<input ref={searchRef} onChange={handleSearch} type="text" placeholder="Search" />
+			<p className="font-poppins font-semibold xs:text-[35px] text-black xs:leading-[76.8px] leading-[66.8px] w-full" style={{fontSize: '30px'}}>Search</p>
+			<input style={{ border: '1px solid #ccc' }} ref={searchRef} onChange={handleSearch} type="text" placeholder="Search" />
 			{isSearching && (
 			<div syle={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
 				{results.map(result => (
-					<div key={result} style={{display: 'flex', alignItems: 'center'}}>
-						<button onClick={handleSearchClick}>{result}
+					<div key={result.item} style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+						
+							<button className="hover:bg-gray-300 rounded-md" onClick={handleSearchClick}>
+								<div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+									{result.icon}
+									{result.item}
+								</div>
 							</button>
+						
 					</div>
 				))}
 			</div>

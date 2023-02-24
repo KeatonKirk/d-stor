@@ -8,6 +8,7 @@ import MintLoadingModal from '../style_components/MintLoadingModal'
 const Login = ({setAuthSig}) => {
 	const record =  useViewerRecord('basicProfile');
 	const [connection, connect, disconnect] = useViewerConnection();
+	const [accounts, setAccounts] = useState(null)
 	const [sigsCollected, setSigsCollected] = useState(false)
 	const [minting, setMinting] = useState(false)
 
@@ -68,21 +69,30 @@ const Login = ({setAuthSig}) => {
 				}
 		}
 
-		const ceramicSignIn = async () => {
+		const ceramicSignIn = async (account) => {
+			try {
 			const accounts = await window.ethereum.request({
 				method: 'eth_requestAccounts',
-			})
+			});
+			console.log('accounts info in ceramic signin:', accounts[0], account)
 			await connect(new EthereumAuthProvider(window.ethereum, accounts[0]));
+		} catch (error) {
+			console.log('error getting accounts:', error)
+			throw error
+		}
+			
 		}
 	
 	const handleClick = async (e) => {
 		e.preventDefault();
 		try {
 			// Get required signatures, check if there's already a user in the db for this address
+			
 			const litAuthSig = await litSignIn();
+			await ceramicSignIn(litAuthSig.address);
 			const sigToSend = JSON.stringify(litAuthSig);
 			const existingUser = await connectWallet(sigToSend);
-			await ceramicSignIn();
+			
 			console.log('RECORD CONTENT after lit and ceramic sign:', record.content, connection)
 
 				if (!existingUser){
@@ -107,11 +117,11 @@ const Login = ({setAuthSig}) => {
 				}
 			} catch (error) {
 			console.log('error in login', error)
-			if (!error.message === 'mint error'){
-				window.alert('Error signing in. Please try again.')
+			if (error.message === 'mint error'){
+				window.alert('Error minting NFT. Please try again.')
 				setMinting(false)
 			} else {
-				window.alert('Error minting NFT. Please try again.')
+				window.alert('Error signing in. Please try again.')
 				setMinting(false)
 			}
 			} 

@@ -56,6 +56,7 @@ const handleClick = async () => {
 		console.log(error)
 	}
 	setFile((prev) => !prev )
+	props.setShowOptions(false)
 }
 
 useEffect(() => {
@@ -77,9 +78,9 @@ if (downloading) {
 	)
 }
 	return (
-		<div >
-		<button className="hover:bg-gray-300 rounded-md" onClick={handleClick}><HiOutlineDownload size={30}/>Download</button>
-		</div>
+		< >
+		<button style={{width: '100%'}} className="block hover:bg-gray-300 rounded-md" onClick={handleClick}>Download</button>
+		</>
 	)
 }
 

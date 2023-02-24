@@ -87,7 +87,6 @@ const Storage = (props) => {
     foldersRef.current = folders
   }
 
-
   useEffect(() => {
     // make sure there is a connection to ceramic, if not, reconnect using address from stored authSig
     if (connection.status === 'idle') {

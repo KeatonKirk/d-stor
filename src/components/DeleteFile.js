@@ -55,7 +55,7 @@ function DeleteFile({deletingFile, setDeletingFile, currentFolderRef, file, buck
 		},
 	};
 	const buttonStyle = {
-    backgroundColor: 'red',
+
     color: 'white',
     border: 'none',
     padding: '8px 16px',
@@ -71,16 +71,16 @@ function DeleteFile({deletingFile, setDeletingFile, currentFolderRef, file, buck
 		<Modal isOpen={deletingFile === file} style={customStyles} shouldFocusAfterRender={true}>
 			
 			{processingDelete ? (
-				<>
+				<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '250px'}}>
 				<h2>Deleting File...</h2>
-				<LineWave color="#FF0000" size={100} />
-				</>
+				<LineWave color="#FF0000" size={200} />
+				</div>
 			) : (
-			<>
+			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
 				<h2 style={{textAlign: 'center'}}>Are you sure you want to delete {file}?</h2>
-				<button style={{width: '100%', margin: '10px'}} onClick={() => setDeletingFile(false)}>Cancel</button>
-				<button style={buttonStyle} onClick={handleDelete}>Delete</button>
-			</>
+				<button className="hover:bg-gray-300 rounded-md" style={{ margin: '10px', padding: '8px'}} onClick={() => setDeletingFile(false)}>Cancel</button>
+				<button className="bg-red-600 hover:bg-red-800" style={buttonStyle} onClick={handleDelete}>Delete</button>
+			</div>
 			)}
 		</Modal>
 

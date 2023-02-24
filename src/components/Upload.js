@@ -4,6 +4,7 @@ import {encryptUser} from './EncryptUser';
 import { useViewerRecord } from "@self.id/framework";
 import axios from 'axios';
 import Modal from 'react-modal';
+import {InfinitySpin} from 'react-loader-spinner';
 
 // take file input from user
 // encrypt file with lit
@@ -14,6 +15,7 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 	const [file, setFile] = useState(null)
 	const [uploading, setUploading] = useState(false)
 	const [loading, setLoading] = useState(0)
+	const [creatingNewFolder, setCreatingNewFolder] = useState(false)
 	const inputRef = useRef(null)
 	const newFolderRef = useRef(null)
 	const record = useViewerRecord('basicProfile')
@@ -32,6 +34,8 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 		const user = user_obj
 		const accessControlConditions = user.nft_info
     const chain = 'goerli'  
+
+		console.log('UPLOAD COMPONENT RENDERED. USER:', user, bucket_id, currentFolderRef.current)
 
 		const file_name = file.name
 		console.log('FILES FROM Dstor USER:', user, user.files)
@@ -87,8 +91,8 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 		user.files[file_name].push(currentFolder)
 		const stringToEncrypt = JSON.stringify(user)
 		const encStringToStore = await encryptUser(stringToEncrypt, accessControlConditions, user)
+		//inputRef.current.value = null
 		setUploading(false)
-		inputRef.current.value = null
 		return encStringToStore
 		} catch (error) {
 			console.log('encrypt file threw error:', error.message)
@@ -98,19 +102,21 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 
 	const newFolder = async (e) => {
 		e.preventDefault()
-
+		const newFolderName = newFolderRef.current.value
+		setCreatingNewFolder(true)
+		console.log('new folder func called', newFolderRef.current)
 		const user = user_obj
 		const accessControlConditions = user.nft_info
 		const getPath = async () => {
 			if (currentFolderRef.current === '/') {
-				return currentFolderRef.current + newFolderRef.current.value
+				return currentFolderRef.current + newFolderName
 			} else {
-				return currentFolderRef.current + '/' + newFolderRef.current.value
+				return currentFolderRef.current + '/' + newFolderName
 			}
 		} 
 
 		const path = await getPath()
-		console.log('data in new folder func', newFolderRef.current.value, bucket_id)
+		console.log('data in new folder func', newFolderName, path, bucket_id)
 		const body = {
 			path: path,
 			bucket_id: bucket_id
@@ -133,6 +139,7 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 		await record.merge({dstor_id: encStringToStore})
 		console.log('new folder response:', response)
 		foldersRef.current.push(path)
+		setCreatingNewFolder(false)
 		setModalIsOpen(false)
 		} catch (error) {
 			console.log('error from new folder attempt:', error.message)
@@ -162,7 +169,7 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 		} catch (error) {
 			console.log('error from upload attempt:', error.message)
 			setUploading(false)
-			inputRef.current.value = null
+			//inputRef.current.value = null
 			window.alert('Oops! Something went wrong. Please try again.')
 		}
 	}
@@ -202,7 +209,7 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 		<>
 		<h2 className="font-poppins font-semibold xs:text-[35px] text-[10px] text-black xs:leading-[76.8px] leading-[66.8px] mt-10">Upload New File</h2>
 		<div className="flex items-center">
-			<input ref={inputRef} disabled={true} type="file" className=" text-sm text-slate-500
+			<input disabled={true} type="file" className=" text-sm text-slate-500
 				file:mr-4 file:py-2 file:px-4
 				file:rounded-full file:border-0
 				file:text-sm file:font-semibold
@@ -237,13 +244,35 @@ function Upload({bucket_id, user_obj, setUser, currentFolderRef, foldersRef, mod
 			<button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700 mt-10" onClick={() => setModalIsOpen(true)}>Add Folder</button>
 			<div>
 				<Modal isOpen={modalIsOpen} style={customStyles}>
-					<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-						<form onSubmit={newFolder}>
-							<label>New Folder Name:</label>
-							<input style={{border: '1px solid #ccc'}} type="text" ref={newFolderRef} />
-							<button className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" type="submit">Submit</button>
-						</form>
-						<button onClick={() => setModalIsOpen(false)}>close</button>
+					<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '10px', marginBottom: '10px'}}>
+						{creatingNewFolder ? (
+							<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+								<p>Creating New Folder...</p>
+								<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+								<InfinitySpin
+									color="#00BFFF"
+									height={100}
+									width={150}
+									timeout={3000} //3 secs
+								/>
+								</div>
+							</div>
+						) : (
+							<>
+							<form onSubmit={newFolder}>
+								<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+									<label>New Folder Name:</label>
+									<input ref={newFolderRef} style={{ border: '1px solid #ccc' }} type="text" />
+									<button style={{ marginTop: '10px' }} className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-700" type="submit">Submit</button>
+								</div>
+							</form>
+						<div style={{marginTop: '20px'}}>
+							<button className="bg-gray-500 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-300" onClick={() => setModalIsOpen(false)}>Cancel</button>
+						</div>
+						</>
+						)}
+
+
 					</div>
 				</Modal>
 			</div>

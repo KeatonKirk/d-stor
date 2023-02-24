@@ -160,12 +160,16 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, 
 												<div className="absolute z-10">
 													<div className="fixed inset-0" onClick={() => setShowOptions(null)} />
 													<div className="origin-top-left absolute right-auto w-56 mt-2 bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-														<div className="py-1" style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-															<div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-																<button className="block hover:bg-gray-300 rounded-md" onClick={() => handleEditNameClick(file)}><HiPencil size={30}/>Edit</button>
+														<div className="py-1" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+															<div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%'}}>
+																<button style={{width: '100%'}} className="block hover:bg-gray-300 rounded-md" onClick={() => handleEditNameClick(file)}>Edit</button>
 															</div>
-																<button onClick={() => handleDeleteClick(file)}className="block hover:bg-gray-300 rounded-md"><HiTrash size={30}/>Delete</button>
-																<Download bucket_id={bucket_id} file_name={file} files={prop_files} />
+															<div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center'}}>
+																<button style={{width: '100%'}}onClick={() => handleDeleteClick(file)}className="block hover:bg-gray-300 rounded-md">Delete</button>
+															</div>
+															<div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center'}}>
+																<Download setShowOptions={setShowOptions} bucket_id={bucket_id} file_name={file} files={prop_files} />
+															</div>
 														</div>
 													</div>
 												</div>
@@ -173,9 +177,11 @@ const Files = ({bucket_id, filesRef, foldersRef, currentFolderRef, modalIsOpen, 
 										</td> 
 										</>
 											)} 
+											<td>
 										{deletingFile === file && (
 											<DeleteFile user={user} bucket_id={bucket_id} currentFolderRef={currentFolderRef} file={file} setDeletingFile={setDeletingFile} deletingFile={deletingFile} />
 										)}
+										</td>
 								</tr>
 									))}
 								</tbody>
