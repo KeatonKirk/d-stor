@@ -14,6 +14,5 @@ Users who connect to d-Stor for the first time will be prompted to mint and NFT 
 
 # Project Roadmap
 - [x] ~~October 2022 - Implement upload/download feature, launch on testnet~~
-- [ ] November 2022 - Front end styling and UX improvement
-- [ ] December 2022 - Implement gasless network to subsidize new user signups
-- [ ] 2023 - Investigate custom decentralized ID solutions, launch on polygon or mainnet ethereum, decentralized node server hosting.
+- [x] November 2022 - Front end styling and UX improvement
+- [x] January 2023 - Feature Additions: Multiple Folder support, folder and file search, rename/delete files.
